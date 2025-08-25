@@ -3,8 +3,8 @@
  * Componentes de estilo vanguardistas negro/naranja
  */
 
-import { StyleSheet } from 'react-native';
-import { Colores } from './Colors';
+import { StyleSheet } from "react-native";
+import { Colores } from "./Colors";
 
 export const EstilosBase = StyleSheet.create({
   // Contenedores principales
@@ -15,8 +15,8 @@ export const EstilosBase = StyleSheet.create({
 
   contenedorCentrado: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: Colores.fondoPrincipal,
   },
 
@@ -61,8 +61,8 @@ export const EstilosBase = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 14,
     paddingHorizontal: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     shadowColor: Colores.naranja,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -71,12 +71,12 @@ export const EstilosBase = StyleSheet.create({
   },
 
   botonSecundario: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     borderRadius: 12,
     paddingVertical: 14,
     paddingHorizontal: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     borderWidth: 2,
     borderColor: Colores.naranja,
   },
@@ -86,8 +86,8 @@ export const EstilosBase = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 14,
     paddingHorizontal: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     shadowColor: Colores.rojo,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -100,8 +100,8 @@ export const EstilosBase = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 14,
     paddingHorizontal: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     shadowColor: Colores.verde,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -110,15 +110,15 @@ export const EstilosBase = StyleSheet.create({
   },
 
   botonFlotante: {
-    position: 'absolute',
-    bottom: 24,
+    position: "absolute",
+    bottom: 90, // Aumentado para evitar superposición con tab bar
     right: 24,
     width: 60,
     height: 60,
     borderRadius: 30,
     backgroundColor: Colores.naranja,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     shadowColor: Colores.naranja,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.4,
@@ -164,8 +164,8 @@ export const EstilosBase = StyleSheet.create({
   // Estados de carga
   indicadorCarga: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: Colores.fondoPrincipal,
   },
 
@@ -174,8 +174,8 @@ export const EstilosBase = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   badgePagado: {
@@ -192,18 +192,18 @@ export const EstilosBase = StyleSheet.create({
 
   // Layouts de grid
   grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
   },
 
   gridItem: {
-    width: '48%',
+    width: "48%",
     marginBottom: 16,
   },
 
   gridItemCompleto: {
-    width: '100%',
+    width: "100%",
     marginBottom: 16,
   },
 
@@ -211,15 +211,15 @@ export const EstilosBase = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     backgroundColor: Colores.fondoModal,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   modalContenido: {
     backgroundColor: Colores.fondoTarjeta,
     borderRadius: 16,
     padding: 24,
-    width: '90%',
+    width: "90%",
     maxWidth: 400,
     shadowColor: Colores.negro,
     shadowOffset: { width: 0, height: 8 },
@@ -230,23 +230,23 @@ export const EstilosBase = StyleSheet.create({
 
   // Filas y columnas
   fila: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
 
   filaJustificada: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
 
   columna: {
-    flexDirection: 'column',
+    flexDirection: "column",
   },
 
   columnaCentrada: {
-    flexDirection: 'column',
-    alignItems: 'center',
+    flexDirection: "column",
+    alignItems: "center",
   },
 
   // Espaciado
