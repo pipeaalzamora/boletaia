@@ -3,34 +3,34 @@
  * Especialmente diseñado para marcar boletas como pagadas
  */
 
-import { Ionicons } from '@expo/vector-icons';
-import React, { useState } from 'react';
+import { Ionicons } from "@expo/vector-icons";
+import React, { useState } from "react";
 import {
-    Dimensions,
-    LayoutChangeEvent,
-    StyleSheet,
-    Text,
-    View,
-} from 'react-native';
+  Dimensions,
+  LayoutChangeEvent,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import {
-    PanGestureHandler,
-    PanGestureHandlerGestureEvent
-} from 'react-native-gesture-handler';
+  PanGestureHandler,
+  PanGestureHandlerGestureEvent,
+} from "react-native-gesture-handler";
 import Animated, {
-    Extrapolate,
-    interpolate,
-    runOnJS,
-    useAnimatedGestureHandler,
-    useAnimatedStyle,
-    useSharedValue,
-    withSpring,
-} from 'react-native-reanimated';
+  Extrapolate,
+  interpolate,
+  runOnJS,
+  useAnimatedGestureHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 
-import { Colores } from '../../constants/Colors';
-import { Tipografia } from '../../constants/Tipografia';
-import { PropsBotonDeslizable } from '../../types';
+import { Colores } from "../../constants/Colors";
+import { Tipografia } from "../../constants/Tipografia";
+import { PropsBotonDeslizable } from "../../types";
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const BUTTON_PADDING = 16;
 const SLIDER_HEIGHT = 60;
 const THUMB_SIZE = 50;
@@ -45,7 +45,9 @@ export function BotonDeslizable({
 }: PropsBotonDeslizable) {
   const [completado, setCompletado] = useState(false);
   const [procesando, setProcesando] = useState(false);
-  const [containerWidth, setContainerWidth] = useState(SCREEN_WIDTH - (BUTTON_PADDING * 2));
+  const [containerWidth, setContainerWidth] = useState(
+    SCREEN_WIDTH - BUTTON_PADDING * 2
+  );
   const translateX = useSharedValue(0);
   const opacity = useSharedValue(1);
 
@@ -64,7 +66,7 @@ export function BotonDeslizable({
   const completeSlider = async () => {
     setCompletado(true);
     setProcesando(true);
-    
+
     try {
       await onDeslizar();
       // Mantener completado si es exitoso
@@ -79,16 +81,19 @@ export function BotonDeslizable({
     }
   };
 
-  const gestureHandler = useAnimatedGestureHandler<PanGestureHandlerGestureEvent, { startX: number }>({
+  const gestureHandler = useAnimatedGestureHandler<
+    PanGestureHandlerGestureEvent,
+    { startX: number }
+  >({
     onStart: (_, context) => {
       context.startX = translateX.value;
     },
     onActive: (event, context) => {
       if (completado || deshabilitado) return;
-      
+
       const newValue = context.startX + event.translationX;
       translateX.value = Math.max(0, Math.min(newValue, maxSlide));
-      
+
       // Fade del texto basado en la posición
       const progress = translateX.value / maxSlide;
       opacity.value = interpolate(
@@ -100,9 +105,9 @@ export function BotonDeslizable({
     },
     onEnd: () => {
       if (completado || deshabilitado) return;
-      
+
       const progress = translateX.value / maxSlide;
-      
+
       if (progress >= SLIDE_THRESHOLD) {
         // Completar deslizamiento
         translateX.value = withSpring(maxSlide);
@@ -134,7 +139,7 @@ export function BotonDeslizable({
   });
 
   const obtenerTextoMostrado = () => {
-    if (procesando) return 'Procesando...';
+    if (procesando) return "Procesando...";
     if (completado) return textoCompletado;
     return texto;
   };
@@ -146,36 +151,37 @@ export function BotonDeslizable({
   };
 
   const obtenerIcono = () => {
-    if (procesando) return 'time';
-    if (completado) return 'checkmark';
-    return 'chevron-forward';
+    if (procesando) return "time";
+    if (completado) return "checkmark";
+    return "chevron-forward";
   };
 
   return (
     <View style={estilos.container} onLayout={handleLayout}>
       {/* Fondo del botón */}
-      <View style={[
-        estilos.background,
-        { 
-          backgroundColor: obtenerColorFondo(),
-          opacity: deshabilitado ? 0.5 : 1,
-        }
-      ]}>
+      <View
+        style={[
+          estilos.background,
+          {
+            backgroundColor: obtenerColorFondo(),
+            opacity: deshabilitado ? 0.5 : 1,
+          },
+        ]}
+      >
         {/* Barra de progreso */}
-        <Animated.View 
+        <Animated.View
           style={[
             estilos.progressBar,
             { backgroundColor: completado ? Colores.verde : `${color}80` },
             progressStyle,
-          ]} 
+          ]}
         />
-        
+
         {/* Texto del botón */}
         <Animated.View style={[estilos.textContainer, textStyle]}>
-          <Text style={[
-            Tipografia.botonPrimario,
-            { color: Colores.textoBlanco }
-          ]}>
+          <Text
+            style={[Tipografia.botonPrimario, { color: Colores.textoBlanco }]}
+          >
             {obtenerTextoMostrado()}
           </Text>
         </Animated.View>
@@ -187,16 +193,18 @@ export function BotonDeslizable({
         enabled={!deshabilitado && !completado}
       >
         <Animated.View style={[estilos.thumb, thumbStyle]}>
-          <View style={[
-            estilos.thumbContent,
-            { 
-              backgroundColor: Colores.textoBlanco,
-              opacity: deshabilitado ? 0.5 : 1,
-            }
-          ]}>
-            <Ionicons 
-              name={obtenerIcono()} 
-              size={24} 
+          <View
+            style={[
+              estilos.thumbContent,
+              {
+                backgroundColor: Colores.textoBlanco,
+                opacity: deshabilitado ? 0.5 : 1,
+              },
+            ]}
+          >
+            <Ionicons
+              name={obtenerIcono()}
+              size={24}
               color={completado ? Colores.verde : color}
             />
           </View>
@@ -206,21 +214,21 @@ export function BotonDeslizable({
       {/* Indicador de dirección */}
       {!completado && !deshabilitado && (
         <View style={estilos.arrowIndicator}>
-          <Ionicons 
-            name="chevron-forward" 
-            size={16} 
-            color={Colores.textoBlanco + '60'} 
+          <Ionicons
+            name="chevron-forward"
+            size={16}
+            color={Colores.textoBlanco + "60"}
           />
-          <Ionicons 
-            name="chevron-forward" 
-            size={16} 
-            color={Colores.textoBlanco + '40'} 
+          <Ionicons
+            name="chevron-forward"
+            size={16}
+            color={Colores.textoBlanco + "40"}
             style={{ marginLeft: -8 }}
           />
-          <Ionicons 
-            name="chevron-forward" 
-            size={16} 
-            color={Colores.textoBlanco + '20'} 
+          <Ionicons
+            name="chevron-forward"
+            size={16}
+            color={Colores.textoBlanco + "20"}
             style={{ marginLeft: -8 }}
           />
         </View>
@@ -232,7 +240,7 @@ export function BotonDeslizable({
 const estilos = StyleSheet.create({
   container: {
     height: SLIDER_HEIGHT,
-    position: 'relative',
+    position: "relative",
     marginVertical: 8,
     flex: 1,
     minWidth: 200, // Ancho mínimo para funcionalidad
@@ -240,25 +248,25 @@ const estilos = StyleSheet.create({
   background: {
     height: SLIDER_HEIGHT,
     borderRadius: SLIDER_HEIGHT / 2,
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'relative',
-    overflow: 'hidden',
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
+    overflow: "hidden",
   },
   progressBar: {
-    position: 'absolute',
+    position: "absolute",
     left: 0,
     top: 0,
-    height: '100%',
+    height: "100%",
     borderRadius: SLIDER_HEIGHT / 2,
   },
   textContainer: {
-    position: 'absolute',
-    width: '100%',
-    alignItems: 'center',
+    position: "absolute",
+    width: "100%",
+    alignItems: "center",
   },
   thumb: {
-    position: 'absolute',
+    position: "absolute",
     left: 5,
     top: (SLIDER_HEIGHT - THUMB_SIZE) / 2,
     width: THUMB_SIZE,
@@ -268,19 +276,19 @@ const estilos = StyleSheet.create({
     width: THUMB_SIZE,
     height: THUMB_SIZE,
     borderRadius: THUMB_SIZE / 2,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 5,
   },
   arrowIndicator: {
-    position: 'absolute',
+    position: "absolute",
     right: 20,
     top: (SLIDER_HEIGHT - 16) / 2,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
 });

@@ -280,7 +280,7 @@ export function TarjetaBoleta({
           <View style={estilos.filaDeslizable}>
             <BotonDeslizable
               onDeslizar={() => manejarMarcarPagado()}
-              texto="Desliza para marcar como pagada"
+              texto="Marcar como pagada"
               textoCompletado="Boleta marcada como pagada"
               color={Colores.verde}
               deshabilitado={procesandoPago}
