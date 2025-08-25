@@ -3,23 +3,17 @@
  * Incluye acciones para editar y marcar como pagada
  */
 
-import { Ionicons } from '@expo/vector-icons';
-import React, { useState } from 'react';
-import {
-  Alert,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import { Ionicons } from "@expo/vector-icons";
+import React, { useState } from "react";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import { Colores } from '../constants/Colors';
-import { Tipografia } from '../constants/Tipografia';
-import { PropsTarjetaBoleta } from '../types';
-import { UtilsBoleta } from '../utils/validaciones';
-import { BadgeDiasRestantes, BadgeEstadoBoleta } from './ui/Badge';
-import { BotonDeslizable } from './ui/BotonDeslizable';
-import { TarjetaBase } from './ui/TarjetaBase';
+import { Colores } from "../constants/Colors";
+import { Tipografia } from "../constants/Tipografia";
+import { PropsTarjetaBoleta } from "../types";
+import { UtilsBoleta } from "../utils/validaciones";
+import { BadgeDiasRestantes, BadgeEstadoBoleta } from "./ui/Badge";
+import { BotonDeslizable } from "./ui/BotonDeslizable";
+import { TarjetaBase } from "./ui/TarjetaBase";
 
 export function TarjetaBoleta({
   boleta,
@@ -37,26 +31,26 @@ export function TarjetaBoleta({
     if (boleta.estaPagada || procesandoPago) return;
 
     Alert.alert(
-      'Confirmar Pago',
+      "Confirmar Pago",
       `¿Confirmas que has pagado la boleta de ${boleta.nombreEmpresa}?`,
       [
         {
-          text: 'Cancelar',
-          style: 'cancel',
+          text: "Cancelar",
+          style: "cancel",
         },
         {
-          text: 'Confirmar',
-          style: 'default',
+          text: "Confirmar",
+          style: "default",
           onPress: async () => {
             try {
               setProcesandoPago(true);
               await onMarcarPagado(boleta.id);
             } catch (error) {
-              console.error('Error al marcar como pagado:', error);
+              console.error("Error al marcar como pagado:", error);
               Alert.alert(
-                'Error',
-                'No se pudo marcar la boleta como pagada. Intenta nuevamente.',
-                [{ text: 'OK' }]
+                "Error",
+                "No se pudo marcar la boleta como pagada. Intenta nuevamente.",
+                [{ text: "OK" }]
               );
             } finally {
               setProcesandoPago(false);
@@ -71,16 +65,16 @@ export function TarjetaBoleta({
     if (!onEliminar) return;
 
     Alert.alert(
-      'Eliminar Boleta',
+      "Eliminar Boleta",
       `¿Estás seguro de eliminar la boleta de ${boleta.nombreEmpresa}?`,
       [
         {
-          text: 'Cancelar',
-          style: 'cancel',
+          text: "Cancelar",
+          style: "cancel",
         },
         {
-          text: 'Eliminar',
-          style: 'destructive',
+          text: "Eliminar",
+          style: "destructive",
           onPress: () => onEliminar(boleta.id),
         },
       ]
@@ -93,35 +87,38 @@ export function TarjetaBoleta({
         try {
           const fechaPago = new Date(boleta.fechaPago);
           if (isNaN(fechaPago.getTime())) {
-            return 'Pagada';
+            return "Pagada";
           }
           return `Pagada el ${UtilsBoleta.formatearFecha(fechaPago)}`;
         } catch (error) {
-          console.error('Error al formatear fecha de pago:', error);
-          return 'Pagada';
+          console.error("Error al formatear fecha de pago:", error);
+          return "Pagada";
         }
       }
-      return 'Pagada';
+      return "Pagada";
     }
-    return UtilsBoleta.obtenerTextoTiempoRestante(estadoCalculado.diasRestantes);
+    return UtilsBoleta.obtenerTextoTiempoRestante(
+      estadoCalculado.diasRestantes
+    );
   };
 
   return (
     <TarjetaBase
       elevada={true}
-      estiloPersonalizado={[
-        estilos.tarjeta,
-        boleta.estaPagada && estilos.tarjetaPagada
-      ].filter(Boolean) as any}
+      estiloPersonalizado={
+        [estilos.tarjeta, boleta.estaPagada && estilos.tarjetaPagada].filter(
+          Boolean
+        ) as any
+      }
     >
       {/* Header con tipo de cuenta y estado */}
       <View style={estilos.header}>
         <View style={estilos.tipoEmpresa}>
           <View style={[estilos.iconoTipo, { backgroundColor: colorTipo }]}>
-            <Ionicons 
-              name={iconoTipo as any} 
-              size={16} 
-              color={Colores.textoBlanco} 
+            <Ionicons
+              name={iconoTipo as any}
+              size={16}
+              color={Colores.textoBlanco}
             />
           </View>
           <View style={estilos.infoEmpresa}>
@@ -129,7 +126,7 @@ export function TarjetaBoleta({
               {boleta.nombreEmpresa}
             </Text>
             <Text style={Tipografia.pequeno}>
-              {boleta.tipoCuenta.toUpperCase().replace('_', ' ')}
+              {boleta.tipoCuenta.toUpperCase().replace("_", " ")}
             </Text>
           </View>
         </View>
@@ -138,10 +135,12 @@ export function TarjetaBoleta({
 
       {/* Monto principal */}
       <View style={estilos.montoContainer}>
-        <Text style={[
-          Tipografia.montoTarjeta,
-          boleta.estaPagada && { color: Colores.verde }
-        ]}>
+        <Text
+          style={[
+            Tipografia.montoTarjeta,
+            boleta.estaPagada && { color: Colores.verde },
+          ]}
+        >
           {UtilsBoleta.formatearMonto(boleta.monto)}
         </Text>
         {!boleta.estaPagada && (
@@ -151,47 +150,94 @@ export function TarjetaBoleta({
 
       {/* Información de fechas */}
       <View style={estilos.fechasContainer}>
-        <View style={estilos.fechaItem}>
-          <Text style={Tipografia.pequeno}>Vencimiento</Text>
-          <Text style={[
-            Tipografia.fechaTarjeta,
-            { color: estadoCalculado.colorEstado }
-          ]}>
-            {(() => {
-              try {
-                const fechaVenc = new Date(boleta.fechaVencimiento);
-                return isNaN(fechaVenc.getTime()) ? 'Fecha inválida' : UtilsBoleta.formatearFecha(fechaVenc);
-              } catch (error) {
-                return 'Fecha inválida';
-              }
-            })()}
-          </Text>
-        </View>
-        {boleta.fechaCorte && (
+        {/* Primera fila: Emisión y Vencimiento */}
+        <View style={estilos.filaFechas}>
           <View style={estilos.fechaItem}>
-            <Text style={Tipografia.pequeno}>Corte</Text>
+            <Text style={Tipografia.pequeno}>Emisión</Text>
             <Text style={Tipografia.fechaTarjeta}>
               {(() => {
                 try {
-                  const fechaCorte = new Date(boleta.fechaCorte);
-                  return isNaN(fechaCorte.getTime()) ? 'Fecha inválida' : UtilsBoleta.formatearFecha(fechaCorte);
+                  const fechaEmision = new Date(boleta.fechaEmision);
+                  return isNaN(fechaEmision.getTime())
+                    ? "N/A"
+                    : UtilsBoleta.formatearFecha(fechaEmision);
                 } catch (error) {
-                  return 'Fecha inválida';
+                  return "N/A";
                 }
               })()}
             </Text>
+          </View>
+          <View style={estilos.fechaItem}>
+            <Text style={Tipografia.pequeno}>Vencimiento</Text>
+            <Text
+              style={[
+                Tipografia.fechaTarjeta,
+                { color: estadoCalculado.colorEstado },
+              ]}
+            >
+              {(() => {
+                try {
+                  const fechaVenc = new Date(boleta.fechaVencimiento);
+                  return isNaN(fechaVenc.getTime())
+                    ? "N/A"
+                    : UtilsBoleta.formatearFecha(fechaVenc);
+                } catch (error) {
+                  return "N/A";
+                }
+              })()}
+            </Text>
+          </View>
+        </View>
+
+        {/* Segunda fila: Corte y Próxima Lectura (solo si existen) */}
+        {(boleta.fechaCorte || boleta.fechaProximaLectura) && (
+          <View style={estilos.filaFechas}>
+            {boleta.fechaCorte && (
+              <View style={estilos.fechaItem}>
+                <Text style={Tipografia.pequeno}>Corte</Text>
+                <Text style={Tipografia.fechaTarjeta}>
+                  {(() => {
+                    try {
+                      const fechaCorte = new Date(boleta.fechaCorte);
+                      return isNaN(fechaCorte.getTime())
+                        ? "N/A"
+                        : UtilsBoleta.formatearFecha(fechaCorte);
+                    } catch (error) {
+                      return "N/A";
+                    }
+                  })()}
+                </Text>
+              </View>
+            )}
+            {boleta.fechaProximaLectura && (
+              <View style={estilos.fechaItem}>
+                <Text style={Tipografia.pequeno}>Próx. Lectura</Text>
+                <Text style={Tipografia.fechaTarjeta}>
+                  {(() => {
+                    try {
+                      const fechaProxLectura = new Date(
+                        boleta.fechaProximaLectura
+                      );
+                      return isNaN(fechaProxLectura.getTime())
+                        ? "N/A"
+                        : UtilsBoleta.formatearFecha(fechaProxLectura);
+                    } catch (error) {
+                      return "N/A";
+                    }
+                  })()}
+                </Text>
+              </View>
+            )}
           </View>
         )}
       </View>
 
       {/* Información adicional */}
       <View style={estilos.infoAdicional}>
-        <Text style={Tipografia.pequeno}>
-          {obtenerTextoTiempoRestante()}
-        </Text>
+        <Text style={Tipografia.pequeno}>{obtenerTextoTiempoRestante()}</Text>
         {boleta.descripcion && (
-          <Text 
-            style={[Tipografia.pequeno, estilos.descripcion]} 
+          <Text
+            style={[Tipografia.pequeno, estilos.descripcion]}
             numberOfLines={2}
           >
             {boleta.descripcion}
@@ -209,12 +255,13 @@ export function TarjetaBoleta({
             style={[estilos.botonAccion, estilos.botonEditar]}
             onPress={() => onEditar(boleta)}
           >
-            <Ionicons 
-              name="pencil" 
-              size={16} 
-              color={Colores.naranja} 
-            />
-            <Text style={[Tipografia.pequeno, { color: Colores.naranja, marginLeft: 4 }]}>
+            <Ionicons name="pencil" size={16} color={Colores.naranja} />
+            <Text
+              style={[
+                Tipografia.pequeno,
+                { color: Colores.naranja, marginLeft: 4 },
+              ]}
+            >
               Editar
             </Text>
           </TouchableOpacity>
@@ -224,11 +271,7 @@ export function TarjetaBoleta({
               style={[estilos.botonAccion, estilos.botonEliminar]}
               onPress={manejarEliminar}
             >
-              <Ionicons 
-                name="trash" 
-                size={16} 
-                color={Colores.rojo} 
-              />
+              <Ionicons name="trash" size={16} color={Colores.rojo} />
             </TouchableOpacity>
           )}
         </View>
@@ -258,14 +301,14 @@ const estilos = StyleSheet.create({
     borderColor: Colores.verde,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
     marginBottom: 16,
   },
   tipoEmpresa: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     flex: 1,
     marginRight: 12,
   },
@@ -273,33 +316,37 @@ const estilos = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 12,
   },
   infoEmpresa: {
     flex: 1,
   },
   montoContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 16,
   },
   fechasContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     marginBottom: 12,
+  },
+  filaFechas: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 8,
   },
   fechaItem: {
     flex: 1,
+    marginHorizontal: 4,
   },
   infoAdicional: {
     marginBottom: 12,
   },
   descripcion: {
     marginTop: 4,
-    fontStyle: 'italic',
+    fontStyle: "italic",
   },
   separador: {
     height: 1,
@@ -310,27 +357,27 @@ const estilos = StyleSheet.create({
     height: 8,
   },
   accionesContainer: {
-    flexDirection: 'column',
+    flexDirection: "column",
   },
   filaSuperior: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 8,
   },
   filaDeslizable: {
-    width: '100%',
+    width: "100%",
   },
   botonAccion: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
     marginLeft: 8,
   },
   botonEditar: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     borderWidth: 1,
     borderColor: Colores.naranja,
   },
@@ -338,7 +385,7 @@ const estilos = StyleSheet.create({
     backgroundColor: Colores.verde,
   },
   botonEliminar: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     borderWidth: 1,
     borderColor: Colores.rojo,
     paddingHorizontal: 8,
