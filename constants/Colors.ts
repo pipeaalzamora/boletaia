@@ -11,6 +11,7 @@ export const Colores = {
   // Colores Secundarios
   verde: '#10B981',
   rojo: '#EF4444',
+  azul: '#3B82F6',
   
   // Variaciones de Negro
   negroSuave: '#1A1A1A',
@@ -28,6 +29,7 @@ export const Colores = {
   // Fondos
   fondoPrincipal: '#000000',
   fondoTarjeta: '#1F1F1F',
+  fondoSecundario: '#2A2A2A',
   fondoInput: '#2A2A2A',
   fondoModal: 'rgba(0, 0, 0, 0.8)',
   
@@ -38,6 +40,7 @@ export const Colores = {
   
   // Textos
   textoBlanco: '#FFFFFF',
+  textoOscuro: '#1A1A1A',
   textoGrisClaro: '#E5E5E5',
   textoGrisMedio: '#B0B0B0',
   textoGrisOscuro: '#808080',
