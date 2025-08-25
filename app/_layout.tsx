@@ -1,15 +1,18 @@
-import { DarkTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { Platform, View } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { DarkTheme, ThemeProvider } from "@react-navigation/native";
+import { useFonts } from "expo-font";
+import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { Platform, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import "react-native-reanimated";
+import {
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { Colores } from '../constants/Colors';
-import { BoletasProvider } from '../context/BoletasContext';
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colores } from "../constants/Colors";
+import { BoletasProvider } from "../context/BoletasContext";
 
 // Tema personalizado para BoletaIA
 const TemaBoletaIA = {
@@ -28,22 +31,22 @@ const TemaBoletaIA = {
 // Componente para el fondo del StatusBar en edge-to-edge
 function StatusBarBackground() {
   const insets = useSafeAreaInsets();
-  
-  if (Platform.OS !== 'android') {
+
+  if (Platform.OS !== "android") {
     return null;
   }
-  
+
   return (
-    <View 
+    <View
       style={{
-        position: 'absolute',
+        position: "absolute",
         top: 0,
         left: 0,
         right: 0,
         height: insets.top,
         backgroundColor: Colores.fondoPrincipal,
         zIndex: 1000,
-      }} 
+      }}
     />
   );
 }
@@ -51,7 +54,7 @@ function StatusBarBackground() {
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 
   if (!loaded) {
@@ -60,20 +63,31 @@ export default function RootLayout() {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <BoletasProvider>
-        <ThemeProvider value={TemaBoletaIA}>
-          <StatusBarBackground />
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="+not-found" />
-            <Stack.Screen name="agregar-boleta" options={{ headerShown: false }} />
-            <Stack.Screen name="editar-boleta" options={{ headerShown: false }} />
-            <Stack.Screen name="configuracion-notificaciones" options={{ headerShown: false }} />
-          </Stack>
-          <StatusBar style="light" />
-        </ThemeProvider>
-      </BoletasProvider>
-    </GestureHandlerRootView>
+    <SafeAreaProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <BoletasProvider>
+          <ThemeProvider value={TemaBoletaIA}>
+            <StatusBarBackground />
+            <Stack>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="+not-found" />
+              <Stack.Screen
+                name="agregar-boleta"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="editar-boleta"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="configuracion-notificaciones"
+                options={{ headerShown: false }}
+              />
+            </Stack>
+            <StatusBar style="light" />
+          </ThemeProvider>
+        </BoletasProvider>
+      </GestureHandlerRootView>
+    </SafeAreaProvider>
   );
 }

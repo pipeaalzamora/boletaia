@@ -1,14 +1,16 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from "@expo/vector-icons";
+import { Tabs } from "expo-router";
+import React from "react";
+import { Platform } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { HapticTab } from '@/components/HapticTab';
-import { Colores } from '../../constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { HapticTab } from "@/components/HapticTab";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colores } from "../../constants/Colors";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
@@ -21,9 +23,9 @@ export default function TabLayout() {
           backgroundColor: Colores.fondoPrincipal,
           borderTopWidth: 1,
           borderTopColor: Colores.bordeOscuro,
-          height: Platform.OS === 'ios' ? 90 : 70,
-          paddingBottom: Platform.OS === 'ios' ? 30 : 10,
           paddingTop: 10,
+          height: Platform.OS === "ios" ? 90 : 70 + insets.bottom,
+          paddingBottom: Platform.OS === "ios" ? 30 : 10 + insets.bottom,
           ...Platform.select({
             ios: {
               shadowColor: Colores.sombra,
@@ -38,19 +40,20 @@ export default function TabLayout() {
         },
         tabBarLabelStyle: {
           fontSize: 12,
-          fontWeight: '600',
+          fontWeight: "600",
           marginTop: 4,
         },
-      }}>
+      }}
+    >
       <Tabs.Screen
         name="dashboard"
         options={{
-          title: 'Dashboard',
+          title: "Dashboard",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons 
-              name={focused ? 'grid' : 'grid-outline'} 
-              size={24} 
-              color={color} 
+            <Ionicons
+              name={focused ? "grid" : "grid-outline"}
+              size={24}
+              color={color}
             />
           ),
         }}
@@ -58,12 +61,12 @@ export default function TabLayout() {
       <Tabs.Screen
         name="configuracion"
         options={{
-          title: 'Configuración',
+          title: "Configuración",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons 
-              name={focused ? 'settings' : 'settings-outline'} 
-              size={24} 
-              color={color} 
+            <Ionicons
+              name={focused ? "settings" : "settings-outline"}
+              size={24}
+              color={color}
             />
           ),
         }}
