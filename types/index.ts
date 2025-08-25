@@ -35,7 +35,7 @@ export interface BoletaInterface {
   monto: number;
   fechaEmision: Date;
   fechaVencimiento: Date;
-  fechaCorte: Date;
+  fechaCorte?: Date;
   fechaProximaLectura: Date;
   descripcion: string;
   estaPagada: boolean;
@@ -81,7 +81,7 @@ export interface NuevaBoleta {
   monto: number;
   fechaEmision: Date;
   fechaVencimiento: Date;
-  fechaCorte: Date;
+  fechaCorte?: Date;
   fechaProximaLectura: Date;
   descripcion: string;
 }
