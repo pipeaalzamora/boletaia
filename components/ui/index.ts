@@ -32,3 +32,5 @@ export {
   BadgeTipoCuenta 
 } from './Badge';
 export type { PropsBadge } from './Badge';
+
+export { SelectorRangoFechas } from './SelectorRangoFechas';
