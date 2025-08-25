@@ -139,31 +139,35 @@ export default function DashboardScreen() {
         {/* Estadísticas rápidas */}
         {boletas.length > 0 && (
           <View style={estilos.estadisticasContainer}>
-            <View style={estilos.estadisticaItem}>
-              <Text style={Tipografia.titulo}>
-                {obtenerEstadisticasRapidas().totalBoletas}
-              </Text>
-              <Text style={Tipografia.pequeno}>Total</Text>
+            <View style={estilos.filaEstadisticas}>
+              <View style={estilos.estadisticaItem}>
+                <Text style={Tipografia.titulo}>
+                  {obtenerEstadisticasRapidas().totalBoletas}
+                </Text>
+                <Text style={Tipografia.pequeno}>Total</Text>
+              </View>
+              <View style={estilos.estadisticaItem}>
+                <Text style={[Tipografia.titulo, { color: Colores.naranja }]}>
+                  {obtenerEstadisticasRapidas().pendientes}
+                </Text>
+                <Text style={Tipografia.pequeno}>Pendientes</Text>
+              </View>
             </View>
-            <View style={estilos.estadisticaItem}>
-              <Text style={[Tipografia.titulo, { color: Colores.naranja }]}>
-                {obtenerEstadisticasRapidas().pendientes}
-              </Text>
-              <Text style={Tipografia.pequeno}>Pendientes</Text>
-            </View>
-            <View style={estilos.estadisticaItem}>
-              <Text style={[Tipografia.titulo, { color: Colores.rojo }]}>
-                {obtenerEstadisticasRapidas().vencidas}
-              </Text>
-              <Text style={Tipografia.pequeno}>Vencidas</Text>
-            </View>
-            <View style={estilos.estadisticaItem}>
-              <Text style={[Tipografia.titulo, { color: Colores.verde }]}>
-                {UtilsBoleta.formatearMonto(
-                  obtenerEstadisticasRapidas().montoPendiente
-                )}
-              </Text>
-              <Text style={Tipografia.pequeno}>Pendiente</Text>
+            <View style={estilos.filaEstadisticas}>
+              <View style={estilos.estadisticaItem}>
+                <Text style={[Tipografia.titulo, { color: Colores.rojo }]}>
+                  {obtenerEstadisticasRapidas().vencidas}
+                </Text>
+                <Text style={Tipografia.pequeno}>Vencidas</Text>
+              </View>
+              <View style={estilos.estadisticaItem}>
+                <Text style={[Tipografia.titulo, { color: Colores.verde }]}>
+                  {UtilsBoleta.formatearMonto(
+                    obtenerEstadisticasRapidas().montoPendiente
+                  )}
+                </Text>
+                <Text style={Tipografia.pequeno}>Pendiente</Text>
+              </View>
             </View>
           </View>
         )}
@@ -230,20 +234,24 @@ const estilos = StyleSheet.create({
     padding: 4,
   },
   estadisticasContainer: {
+    marginBottom: 24,
+  },
+  filaEstadisticas: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 24,
-    paddingHorizontal: 4,
+    marginBottom: 12,
   },
   estadisticaItem: {
     flex: 1,
     alignItems: "center",
-    padding: 12,
+    padding: 16,
     backgroundColor: Colores.fondoTarjeta,
     borderRadius: 12,
-    marginHorizontal: 4,
+    marginHorizontal: 6,
     borderWidth: 1,
     borderColor: Colores.bordeOscuro,
+    minHeight: 80,
+    justifyContent: "center",
   },
   seccionBoletas: {
     marginBottom: 120, // Espacio aumentado para el botón flotante
