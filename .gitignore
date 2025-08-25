@@ -3,6 +3,9 @@
 # dependencies
 node_modules/
 
+#qoder
+.qoder/
+
 # Expo
 .expo/
 dist/
