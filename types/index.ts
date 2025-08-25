@@ -140,17 +140,21 @@ export interface AccionesBoletasContexto {
   setError: (error: string | null) => void;
 }
 
-// Tipos para navegación
+// Tipos para navegación (actualizados para incluir reportes)
 export type RootStackParamList = {
   Dashboard: undefined;
+  Reportes: undefined;
   AgregarBoleta: undefined;
   EditarBoleta: { boleta: BoletaInterface };
+  GenerarReporte: { filtros?: FiltrosReporte };
+  VistaReporte: { rutaArchivo: string };
   Configuracion: undefined;
   ConfiguracionNotificaciones: undefined;
 };
 
 export type TabParamList = {
   dashboard: undefined;
+  reportes: undefined;
   configuracion: undefined;
 };
 
@@ -286,4 +290,138 @@ export const TIPOS_NOTIFICACION_LABELS: Record<TipoNotificacion, string> = {
   [TipoNotificacion.TRES_DIAS_ANTES]: '3 días antes',
   [TipoNotificacion.UNA_SEMANA_ANTES]: '1 semana antes',
   [TipoNotificacion.EL_MISMO_DIA]: 'El mismo día',
+};
+
+// === TIPOS PARA SISTEMA DE REPORTES ===
+
+// Tipos para rangos de fechas predefinidos
+export enum RangoFechas {
+  ULTIMO_MES = 'ultimo_mes',
+  ULTIMOS_TRES_MESES = 'ultimos_tres_meses',
+  ULTIMO_SEMESTRE = 'ultimo_semestre',
+  ULTIMO_ANO = 'ultimo_ano',
+  PERSONALIZADO = 'personalizado',
+}
+
+// Configuración de reporte
+export interface ConfiguracionReporte {
+  id: string;
+  nombre: string;
+  descripcion: string;
+  filtros: FiltrosReporte;
+  incluirGraficos: boolean;
+  incluirResumen: boolean;
+  formatoFecha: 'dd/mm/yyyy' | 'mm/dd/yyyy';
+  formatoMoneda: 'CLP' | 'USD';
+  fechaCreacion: Date;
+  fechaActualizacion: Date;
+}
+
+// Filtros para reportes
+export interface FiltrosReporte {
+  fechaInicio: Date;
+  fechaFin: Date;
+  tiposCuenta: TipoCuenta[];
+  estados: EstadoBoleta[];
+  empresas: string[];
+  rangoFechas: RangoFechas;
+}
+
+// Datos completos del reporte
+export interface DatosReporte {
+  configuracion: ConfiguracionReporte;
+  boletas: BoletaInterface[];
+  resumen: ResumenReporte;
+  fechaGeneracion: Date;
+}
+
+// Resumen estadístico del reporte
+export interface ResumenReporte {
+  totalBoletas: number;
+  totalMonto: number;
+  boletasPagadas: number;
+  montoPagado: number;
+  boletasPendientes: number;
+  montoPendiente: number;
+  boletasVencidas: number;
+  montoVencido: number;
+  promedioMensual: number;
+  distribuccionPorTipo: Record<TipoCuenta, number>;
+  distribuccionPorEmpresa: Record<string, number>;
+}
+
+// Reporte guardado localmente
+export interface ReporteGuardado {
+  id: string;
+  nombre: string;
+  rutaArchivo: string;
+  fechaGeneracion: Date;
+  tamaño: number; // en bytes
+  configuracion: ConfiguracionReporte;
+}
+
+// Estado del contexto de reportes
+export interface EstadoReportesContexto {
+  reportesGenerados: ReporteGuardado[];
+  configuracionesGuardadas: ConfiguracionReporte[];
+  cargandoReporte: boolean;
+  errorReporte: string | null;
+  filtrosActivos: FiltrosReporte;
+}
+
+// Acciones del contexto de reportes
+export interface AccionesReportesContexto {
+  generarReporte: (config: ConfiguracionReporte) => Promise<string>;
+  guardarConfiguracion: (config: ConfiguracionReporte) => Promise<void>;
+  cargarConfiguraciones: () => Promise<void>;
+  eliminarConfiguracion: (id: string) => Promise<void>;
+  aplicarFiltros: (filtros: FiltrosReporte) => void;
+  limpiarFiltros: () => void;
+  compartirReporte: (rutaArchivo: string) => Promise<void>;
+  eliminarReporte: (id: string) => Promise<void>;
+  setError: (error: string | null) => void;
+  generarConfiguracionRapida: () => ConfiguracionReporte;
+  obtenerResumenFiltrado: () => ResumenReporte;
+}
+
+// Props para generador de PDF
+export interface PropsGeneradorPDF {
+  datos: DatosReporte;
+  onGenerado: (rutaArchivo: string) => void;
+  onError: (error: string) => void;
+}
+
+// Props para componentes de reportes
+export interface PropsEncabezadoReportes {
+  resumen: ResumenReporte;
+  periodoSeleccionado: string;
+}
+
+export interface PropsFiltrosReportes {
+  filtros: FiltrosReporte;
+  onAplicarFiltros: (filtros: FiltrosReporte) => void;
+  onLimpiarFiltros: () => void;
+}
+
+export interface PropsTarjetaReporte {
+  reporte: ReporteGuardado;
+  onGenerar: () => void;
+  onCompartir: () => void;
+  onEliminar: () => void;
+}
+
+export interface PropsSelectorRangoFechas {
+  rangoSeleccionado: RangoFechas;
+  fechaInicio: Date;
+  fechaFin: Date;
+  onCambiarRango: (rango: RangoFechas, fechaInicio?: Date, fechaFin?: Date) => void;
+}
+
+// Constantes para reportes
+export const RANGOS_FECHAS_LABELS: Record<RangoFechas, string> = {
+  [RangoFechas.ULTIMO_MES]: 'Último mes',
+  [RangoFechas.ULTIMOS_TRES_MESES]: 'Últimos 3 meses',
+  [RangoFechas.ULTIMO_SEMESTRE]: 'Último semestre',
+  [RangoFechas.ULTIMO_ANO]: 'Último año',
+  [RangoFechas.PERSONALIZADO]: 'Personalizado',
 };
