@@ -3,21 +3,21 @@
  * Gestiona recordatorios y alertas de vencimiento de boletas
  */
 
+import { isAfter, setHours, setMinutes, subDays } from 'date-fns';
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
-import { addDays, subDays, setHours, setMinutes, isAfter, isBefore } from 'date-fns';
 
-import { 
-  BoletaInterface, 
+import {
+  BoletaInterface,
   ConfiguracionNotificaciones,
-  TipoNotificacion,
-  NotificacionInterface 
+  TipoNotificacion
 } from '../types';
 
 // Configurar el comportamiento de las notificaciones
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldShowAlert: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
     shouldPlaySound: true,
     shouldSetBadge: true,
   }),
@@ -36,7 +36,7 @@ export class ServicioNotificaciones {
           importance: Notifications.AndroidImportance.HIGH,
           vibrationPattern: [0, 250, 250, 250],
           lightColor: '#FF6B35',
-          sound: true,
+          sound: 'default',
         });
       }
 
@@ -71,6 +71,13 @@ export class ServicioNotificaciones {
       await this.cancelarNotificacionesBoleta(boleta.id);
 
       const fechaVencimiento = new Date(boleta.fechaVencimiento);
+      
+      // Validar que la fecha de vencimiento sea válida
+      if (isNaN(fechaVencimiento.getTime())) {
+        console.error('Fecha de vencimiento inválida para boleta:', boleta.id);
+        return;
+      }
+      
       const ahora = new Date();
       
       // Configurar hora de notificación
@@ -97,7 +104,7 @@ export class ServicioNotificaciones {
             fecha: fechaNotificacion,
             tipo: TipoNotificacion.UNA_SEMANA_ANTES,
             titulo: '📅 Recordatorio de Boleta',
-            mensaje: `Tu boleta de ${boleta.nombreEmpresa} vence en 1 semana (${fechaVencimiento.toLocaleDateString('es-CL')})`,
+            mensaje: `Tu boleta de ${boleta.nombreEmpresa} vence en 1 semana (${fechaVencimiento.toISOString().split('T')[0].split('-').reverse().join('/')})`,
           });
         }
       }
@@ -159,8 +166,9 @@ export class ServicioNotificaciones {
             }),
           },
           trigger: {
+            type: Notifications.SchedulableTriggerInputTypes.DATE,
             date: notif.fecha,
-          },
+          } as Notifications.DateTriggerInput,
         });
       }
 
@@ -268,7 +276,10 @@ export class ServicioNotificaciones {
           data: { tipo: 'prueba' },
           sound: true,
         },
-        trigger: { seconds: 1 },
+        trigger: { 
+          type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+          seconds: 1 
+        } as Notifications.TimeIntervalTriggerInput,
       });
     } catch (error) {
       console.error('Error al enviar notificación de prueba:', error);
@@ -287,7 +298,7 @@ export class ServicioNotificaciones {
       const porBoleta: Record<string, number> = {};
 
       notificaciones.forEach(notif => {
-        const boletaId = notif.content.data?.boletaId;
+        const boletaId = notif.content.data?.boletaId as string;
         if (boletaId) {
           porBoleta[boletaId] = (porBoleta[boletaId] || 0) + 1;
         }
