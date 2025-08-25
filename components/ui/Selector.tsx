@@ -102,10 +102,36 @@ export function Selector(props: PropsSelector) {
   const obtenerTextoMostrado = (): string => {
     if (props.tipo === 'fecha') {
       if (props.value) {
-        const formatoFecha = props.modo === 'time' ? 'HH:mm' : 
-                            props.modo === 'datetime' ? 'dd/MM/yyyy HH:mm' :
-                            'dd/MM/yyyy';
-        return props.value.toLocaleDateString('es-CL');
+        try {
+          // Validar que la fecha sea válida
+          if (isNaN(props.value.getTime())) {
+            return 'Fecha inválida';
+          }
+          
+          const formatoFecha = props.modo === 'time' ? 'HH:mm' : 
+                              props.modo === 'datetime' ? 'dd/MM/yyyy HH:mm' :
+                              'dd/MM/yyyy';
+          
+          // Usar formateo seguro en lugar de toLocaleDateString
+          if (props.modo === 'time') {
+            return props.value.toTimeString().slice(0, 5);
+          } else {
+            const dia = props.value.getDate().toString().padStart(2, '0');
+            const mes = (props.value.getMonth() + 1).toString().padStart(2, '0');
+            const año = props.value.getFullYear();
+            
+            if (props.modo === 'datetime') {
+              const hora = props.value.getHours().toString().padStart(2, '0');
+              const minutos = props.value.getMinutes().toString().padStart(2, '0');
+              return `${dia}/${mes}/${año} ${hora}:${minutos}`;
+            }
+            
+            return `${dia}/${mes}/${año}`;
+          }
+        } catch (error) {
+          console.error('Error al formatear fecha:', error);
+          return 'Fecha inválida';
+        }
       }
       return placeholder || 'Seleccionar fecha';
     } else {
