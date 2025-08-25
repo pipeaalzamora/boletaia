@@ -125,7 +125,7 @@ export function TarjetaBoleta({
             <Text style={Tipografia.tituloTarjeta} numberOfLines={1}>
               {boleta.nombreEmpresa}
             </Text>
-            <Text style={Tipografia.pequeno}>
+            <Text style={[Tipografia.pequeno, { color: Colores.textoBlanco }]}>
               {boleta.tipoCuenta.toUpperCase().replace("_", " ")}
             </Text>
           </View>
@@ -153,7 +153,9 @@ export function TarjetaBoleta({
         {/* Primera fila: Emisión y Vencimiento */}
         <View style={estilos.filaFechas}>
           <View style={estilos.fechaItem}>
-            <Text style={Tipografia.pequeno}>Emisión</Text>
+            <Text style={[Tipografia.pequeno, { color: Colores.textoBlanco }]}>
+              Emisión
+            </Text>
             <Text style={Tipografia.fechaTarjeta}>
               {(() => {
                 try {
@@ -168,7 +170,9 @@ export function TarjetaBoleta({
             </Text>
           </View>
           <View style={estilos.fechaItem}>
-            <Text style={Tipografia.pequeno}>Vencimiento</Text>
+            <Text style={[Tipografia.pequeno, { color: Colores.textoBlanco }]}>
+              Vencimiento
+            </Text>
             <Text
               style={[
                 Tipografia.fechaTarjeta,
@@ -194,7 +198,11 @@ export function TarjetaBoleta({
           <View style={estilos.filaFechas}>
             {boleta.fechaCorte && (
               <View style={estilos.fechaItem}>
-                <Text style={Tipografia.pequeno}>Corte</Text>
+                <Text
+                  style={[Tipografia.pequeno, { color: Colores.textoBlanco }]}
+                >
+                  Corte
+                </Text>
                 <Text style={Tipografia.fechaTarjeta}>
                   {(() => {
                     try {
@@ -211,7 +219,11 @@ export function TarjetaBoleta({
             )}
             {boleta.fechaProximaLectura && (
               <View style={estilos.fechaItem}>
-                <Text style={Tipografia.pequeno}>Próx. Lectura</Text>
+                <Text
+                  style={[Tipografia.pequeno, { color: Colores.textoBlanco }]}
+                >
+                  Próx. Lectura
+                </Text>
                 <Text style={Tipografia.fechaTarjeta}>
                   {(() => {
                     try {
@@ -234,10 +246,16 @@ export function TarjetaBoleta({
 
       {/* Información adicional */}
       <View style={estilos.infoAdicional}>
-        <Text style={Tipografia.pequeno}>{obtenerTextoTiempoRestante()}</Text>
+        <Text style={[Tipografia.pequeno, { color: Colores.textoGrisClaro }]}>
+          {obtenerTextoTiempoRestante()}
+        </Text>
         {boleta.descripcion && (
           <Text
-            style={[Tipografia.pequeno, estilos.descripcion]}
+            style={[
+              Tipografia.pequeno,
+              estilos.descripcion,
+              { color: Colores.textoGrisMedio },
+            ]}
             numberOfLines={2}
           >
             {boleta.descripcion}
