@@ -3,26 +3,26 @@
  * Configuración detallada de alertas y recordatorios
  */
 
-import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  ScrollView, 
-  Switch,
-  StyleSheet,
-  Alert 
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import {
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  View
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { useBoletasContext } from '../context/BoletasContext';
+import { BotonPrimario } from '../components/ui/BotonPrimario';
+import { OpcionSelector, Selector } from '../components/ui/Selector';
+import { TarjetaConfiguracion } from '../components/ui/TarjetaBase';
+import { Colores } from '../constants/Colors';
 import { EstilosBase } from '../constants/EstilosBase';
 import { Tipografia } from '../constants/Tipografia';
-import { Colores } from '../constants/Colors';
-import { TarjetaConfiguracion } from '../components/ui/TarjetaBase';
-import { BotonPrimario } from '../components/ui/BotonPrimario';
-import { Selector, OpcionSelector } from '../components/ui/Selector';
+import { useBoletasContext } from '../context/BoletasContext';
 import { ConfiguracionNotificaciones } from '../types';
 
 export default function ConfiguracionNotificacionesScreen() {
@@ -32,14 +32,44 @@ export default function ConfiguracionNotificacionesScreen() {
     configurarNotificaciones 
   } = useBoletasContext();
 
-  const [config, setConfig] = useState<ConfiguracionNotificaciones>({
-    usuarioId: configuracionNotificaciones?.usuarioId || '',
-    tresDiasAntes: configuracionNotificaciones?.tresDiasAntes || true,
-    unaSemanaAntes: configuracionNotificaciones?.unaSemanaAntes || true,
-    elMismoDia: configuracionNotificaciones?.elMismoDia || true,
-    horaNotificacion: configuracionNotificaciones?.horaNotificacion || '09:00',
-    habilitadas: configuracionNotificaciones?.habilitadas || true,
+  const [config, setConfig] = useState<ConfiguracionNotificaciones>(() => {
+    // Inicializar con la configuración del contexto si existe, sino usar defaults
+    return {
+      usuarioId: configuracionNotificaciones?.usuarioId || '',
+      tresDiasAntes: configuracionNotificaciones?.tresDiasAntes ?? true,
+      unaSemanaAntes: configuracionNotificaciones?.unaSemanaAntes ?? true,
+      elMismoDia: configuracionNotificaciones?.elMismoDia ?? true,
+      horaNotificacion: configuracionNotificaciones?.horaNotificacion || '09:00',
+      habilitadas: configuracionNotificaciones?.habilitadas ?? true,
+    };
   });
+
+  // Actualizar config local cuando cambie la configuración del contexto
+  React.useEffect(() => {
+    if (configuracionNotificaciones) {
+      console.log('Actualizando config local desde contexto:', configuracionNotificaciones);
+      setConfig({
+        usuarioId: configuracionNotificaciones.usuarioId,
+        tresDiasAntes: configuracionNotificaciones.tresDiasAntes,
+        unaSemanaAntes: configuracionNotificaciones.unaSemanaAntes,
+        elMismoDia: configuracionNotificaciones.elMismoDia,
+        horaNotificacion: configuracionNotificaciones.horaNotificacion,
+        habilitadas: configuracionNotificaciones.habilitadas,
+      });
+    }
+  }, [configuracionNotificaciones]);
+
+  // Log para diagnosticar cambios importantes
+  React.useEffect(() => {
+    console.log('Estado inicial config:', { habilitadas: config.habilitadas });
+  }, []);
+
+  // Log para ver cambios en la configuración del contexto
+  React.useEffect(() => {
+    if (configuracionNotificaciones) {
+      console.log('Configuración del contexto actualizada:', { habilitadas: configuracionNotificaciones.habilitadas });
+    }
+  }, [configuracionNotificaciones]);
 
   const [guardando, setGuardando] = useState(false);
 
@@ -56,6 +86,9 @@ export default function ConfiguracionNotificacionesScreen() {
   ];
 
   const actualizarConfiguracion = (campo: keyof ConfiguracionNotificaciones, valor: any) => {
+    if (campo === 'habilitadas') {
+      console.log(`Cambiando notificaciones: ${valor ? 'activadas' : 'desactivadas'}`);
+    }
     setConfig(prev => ({
       ...prev,
       [campo]: valor,
@@ -81,7 +114,7 @@ export default function ConfiguracionNotificacionesScreen() {
       console.error('Error al guardar configuración:', error);
       Alert.alert(
         'Error',
-        'No se pudo guardar la configuración. Intenta nuevamente.',
+        `No se pudo guardar la configuración: ${error instanceof Error ? error.message : 'Error desconocido'}`,
         [{ text: 'OK' }]
       );
     } finally {
