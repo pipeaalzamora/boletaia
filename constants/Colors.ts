@@ -1,26 +1,65 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * Sistema de colores vanguardista para BoletaIA
+ * Esquema principal: Negro y Naranja con acentos verde y rojo
  */
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+export const Colores = {
+  // Colores Principales
+  negro: '#000000',
+  naranja: '#FF6B35',
+  
+  // Colores Secundarios
+  verde: '#10B981',
+  rojo: '#EF4444',
+  
+  // Variaciones de Negro
+  negroSuave: '#1A1A1A',
+  grisOscuro: '#1F1F1F',
+  grisMedio: '#2A2A2A',
+  grisClaro: '#F5F5F5',
+  blanco: '#FFFFFF',
+  
+  // Estados de Boletas
+  pendiente: '#FF6B35',
+  pagado: '#10B981',
+  vencido: '#EF4444',
+  proximo: '#FFA726',
+  
+  // Fondos
+  fondoPrincipal: '#000000',
+  fondoTarjeta: '#1F1F1F',
+  fondoInput: '#2A2A2A',
+  fondoModal: 'rgba(0, 0, 0, 0.8)',
+  
+  // Bordes y Separadores
+  bordeOscuro: '#333333',
+  bordeClaro: '#404040',
+  sombra: 'rgba(255, 107, 53, 0.2)',
+  
+  // Textos
+  textoBlanco: '#FFFFFF',
+  textoGrisClaro: '#E5E5E5',
+  textoGrisMedio: '#B0B0B0',
+  textoGrisOscuro: '#808080',
+  textoNaranja: '#FF6B35',
+};
 
+// Para compatibilidad con el sistema existente
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    text: Colores.textoBlanco,
+    background: Colores.fondoPrincipal,
+    tint: Colores.naranja,
+    icon: Colores.textoGrisMedio,
+    tabIconDefault: Colores.textoGrisMedio,
+    tabIconSelected: Colores.naranja,
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+    text: Colores.textoBlanco,
+    background: Colores.fondoPrincipal,
+    tint: Colores.naranja,
+    icon: Colores.textoGrisMedio,
+    tabIconDefault: Colores.textoGrisMedio,
+    tabIconSelected: Colores.naranja,
   },
 };

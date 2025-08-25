@@ -37,6 +37,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "a35dd1bc-7064-410d-a3df-33b44e27cbbc"
+      }
+    },
+    "owner": "pipealzamora"
   }
 }
