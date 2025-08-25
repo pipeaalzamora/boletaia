@@ -59,7 +59,7 @@ export class ValidadorBoleta {
     }
 
     if (!boleta.fechaCorte) {
-      errores.fechaCorte = 'La fecha de corte es requerida';
+      // La fecha de corte es opcional, no generar error
     } else if (boleta.fechaVencimiento) {
       const fechaCorte = new Date(boleta.fechaCorte);
       const fechaVencimiento = new Date(boleta.fechaVencimiento);
@@ -195,47 +195,68 @@ export class UtilsBoleta {
    * Calcula el estado de una boleta basado en fechas
    */
   static calcularEstadoBoleta(boleta: BoletaInterface): EstadoBoletaCalculado {
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
-    
-    const fechaVencimiento = new Date(boleta.fechaVencimiento);
-    fechaVencimiento.setHours(0, 0, 0, 0);
-    
-    const diasRestantes = differenceInDays(fechaVencimiento, hoy);
+    try {
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
+      
+      const fechaVencimiento = new Date(boleta.fechaVencimiento);
+      
+      // Validar que la fecha de vencimiento sea válida
+      if (isNaN(fechaVencimiento.getTime())) {
+        return {
+          estado: EstadoBoleta.PENDIENTE,
+          diasRestantes: 0,
+          colorEstado: Colores.grisMedio,
+          textoEstado: 'Fecha inválida',
+        };
+      }
+      
+      fechaVencimiento.setHours(0, 0, 0, 0);
+      
+      const diasRestantes = differenceInDays(fechaVencimiento, hoy);
 
-    if (boleta.estaPagada) {
+      if (boleta.estaPagada) {
+        return {
+          estado: EstadoBoleta.PAGADA,
+          diasRestantes,
+          colorEstado: Colores.verde,
+          textoEstado: 'Pagada',
+        };
+      }
+
+      if (diasRestantes < 0) {
+        return {
+          estado: EstadoBoleta.VENCIDA,
+          diasRestantes,
+          colorEstado: Colores.rojo,
+          textoEstado: 'Vencida',
+        };
+      }
+
+      if (diasRestantes <= 3) {
+        return {
+          estado: EstadoBoleta.PROXIMA,
+          diasRestantes,
+          colorEstado: Colores.proximo,
+          textoEstado: 'Próxima a vencer',
+        };
+      }
+
       return {
-        estado: EstadoBoleta.PAGADA,
+        estado: EstadoBoleta.PENDIENTE,
         diasRestantes,
-        colorEstado: Colores.verde,
-        textoEstado: 'Pagada',
+        colorEstado: Colores.naranja,
+        textoEstado: 'Pendiente',
+      };
+    } catch (error) {
+      console.error('Error al calcular estado de boleta:', error);
+      return {
+        estado: EstadoBoleta.PENDIENTE,
+        diasRestantes: 0,
+        colorEstado: Colores.grisMedio,
+        textoEstado: 'Error',
       };
     }
-
-    if (diasRestantes < 0) {
-      return {
-        estado: EstadoBoleta.VENCIDA,
-        diasRestantes,
-        colorEstado: Colores.rojo,
-        textoEstado: 'Vencida',
-      };
-    }
-
-    if (diasRestantes <= 3) {
-      return {
-        estado: EstadoBoleta.PROXIMA,
-        diasRestantes,
-        colorEstado: Colores.proximo,
-        textoEstado: 'Próxima a vencer',
-      };
-    }
-
-    return {
-      estado: EstadoBoleta.PENDIENTE,
-      diasRestantes,
-      colorEstado: Colores.naranja,
-      textoEstado: 'Pendiente',
-    };
   }
 
   /**
@@ -264,7 +285,16 @@ export class UtilsBoleta {
    * Formatea una fecha en español
    */
   static formatearFecha(fecha: Date, formato: string = 'dd/MM/yyyy'): string {
-    return format(fecha, formato, { locale: es });
+    try {
+      // Validar que la fecha sea válida
+      if (!fecha || isNaN(fecha.getTime())) {
+        return 'Fecha inválida';
+      }
+      return format(fecha, formato, { locale: es });
+    } catch (error) {
+      console.error('Error al formatear fecha:', error);
+      return 'Fecha inválida';
+    }
   }
 
   /**
@@ -293,16 +323,22 @@ export class UtilsBoleta {
    * Convierte datos del formulario a objeto NuevaBoleta
    */
   static convertirFormularioABoleta(datos: DatosFormularioBoleta): NuevaBoleta {
-    return {
+    const boleta: NuevaBoleta = {
       tipoCuenta: datos.tipoCuenta as TipoCuenta,
       nombreEmpresa: datos.nombreEmpresa.trim(),
       monto: parseFloat(datos.monto),
       fechaEmision: new Date(datos.fechaEmision),
       fechaVencimiento: new Date(datos.fechaVencimiento),
-      fechaCorte: new Date(datos.fechaCorte),
       fechaProximaLectura: new Date(datos.fechaProximaLectura),
       descripcion: datos.descripcion.trim(),
     };
+    
+    // Solo agregar fecha de corte si se proporciona
+    if (datos.fechaCorte && datos.fechaCorte.trim() !== '') {
+      boleta.fechaCorte = new Date(datos.fechaCorte);
+    }
+    
+    return boleta;
   }
 
   /**
@@ -315,7 +351,7 @@ export class UtilsBoleta {
       monto: boleta.monto.toString(),
       fechaEmision: format(new Date(boleta.fechaEmision), 'yyyy-MM-dd'),
       fechaVencimiento: format(new Date(boleta.fechaVencimiento), 'yyyy-MM-dd'),
-      fechaCorte: format(new Date(boleta.fechaCorte), 'yyyy-MM-dd'),
+      fechaCorte: boleta.fechaCorte ? format(new Date(boleta.fechaCorte), 'yyyy-MM-dd') : '',
       fechaProximaLectura: format(new Date(boleta.fechaProximaLectura), 'yyyy-MM-dd'),
       descripcion: boleta.descripcion,
     };
