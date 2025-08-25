@@ -3,18 +3,18 @@
  * Gestión global de estado para boletas, usuarios y configuraciones
  */
 
-import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
-  BoletaInterface,
-  UsuarioInterface,
-  ConfiguracionNotificaciones,
-  NuevaBoleta,
-  ActualizacionBoleta,
-  EstadoBoletasContexto,
-  AccionesBoletasContexto,
-} from '../types';
+import React, { createContext, ReactNode, useContext, useEffect, useReducer } from 'react';
 import { ServicioNotificaciones } from '../services/NotificacionesService';
+import {
+  AccionesBoletasContexto,
+  ActualizacionBoleta,
+  BoletaInterface,
+  ConfiguracionNotificaciones,
+  EstadoBoletasContexto,
+  NuevaBoleta,
+  UsuarioInterface,
+} from '../types';
 
 // Tipos para el reducer
 type AccionBoletas =
@@ -117,17 +117,25 @@ const StorageUtils = {
       const boletasJson = await AsyncStorage.getItem(STORAGE_KEYS.BOLETAS);
       if (boletasJson) {
         const boletas = JSON.parse(boletasJson);
-        // Convertir strings de fecha a objetos Date
-        return boletas.map((boleta: any) => ({
-          ...boleta,
-          fechaEmision: new Date(boleta.fechaEmision),
-          fechaVencimiento: new Date(boleta.fechaVencimiento),
-          fechaCorte: new Date(boleta.fechaCorte),
-          fechaProximaLectura: new Date(boleta.fechaProximaLectura),
-          fechaCreacion: new Date(boleta.fechaCreacion),
-          fechaActualizacion: new Date(boleta.fechaActualizacion),
-          fechaPago: boleta.fechaPago ? new Date(boleta.fechaPago) : undefined,
-        }));
+        // Convertir strings de fecha a objetos Date con validación
+        return boletas.map((boleta: any) => {
+          const convertirFechaSafe = (fecha: any): Date => {
+            if (!fecha) return new Date();
+            const fechaConvertida = new Date(fecha);
+            return isNaN(fechaConvertida.getTime()) ? new Date() : fechaConvertida;
+          };
+          
+          return {
+            ...boleta,
+            fechaEmision: convertirFechaSafe(boleta.fechaEmision),
+            fechaVencimiento: convertirFechaSafe(boleta.fechaVencimiento),
+            fechaCorte: boleta.fechaCorte ? convertirFechaSafe(boleta.fechaCorte) : undefined,
+            fechaProximaLectura: convertirFechaSafe(boleta.fechaProximaLectura),
+            fechaCreacion: convertirFechaSafe(boleta.fechaCreacion),
+            fechaActualizacion: convertirFechaSafe(boleta.fechaActualizacion),
+            fechaPago: boleta.fechaPago ? convertirFechaSafe(boleta.fechaPago) : undefined,
+          };
+        });
       }
       return [];
     } catch (error) {
@@ -164,15 +172,21 @@ const StorageUtils = {
   async guardarConfiguracion(configuracion: ConfiguracionNotificaciones): Promise<void> {
     try {
       await AsyncStorage.setItem(STORAGE_KEYS.CONFIGURACION, JSON.stringify(configuracion));
+      console.log('Configuración guardada en storage:', { habilitadas: configuracion.habilitadas });
     } catch (error) {
-      console.error('Error al guardar configuración:', error);
+      console.error('Error al guardar configuración en AsyncStorage:', error);
+      throw error;
     }
   },
 
   async cargarConfiguracion(): Promise<ConfiguracionNotificaciones | null> {
     try {
       const configJson = await AsyncStorage.getItem(STORAGE_KEYS.CONFIGURACION);
-      return configJson ? JSON.parse(configJson) : null;
+      const resultado = configJson ? JSON.parse(configJson) : null;
+      if (resultado) {
+        console.log('Configuración cargada:', { habilitadas: resultado.habilitadas });
+      }
+      return resultado;
     } catch (error) {
       console.error('Error al cargar configuración:', error);
       return null;
@@ -207,12 +221,8 @@ export function BoletasProvider({ children }: BoletasProviderProps) {
     }
   }, [estado.usuario]);
 
-  // Guardar configuración cuando cambie
-  useEffect(() => {
-    if (estado.configuracionNotificaciones) {
-      StorageUtils.guardarConfiguracion(estado.configuracionNotificaciones);
-    }
-  }, [estado.configuracionNotificaciones]);
+  // NOTA: No guardamos automáticamente la configuración aquí para evitar
+  // guardados duplicados. Se guarda explícitamente en configurarNotificaciones()
 
   const cargarDatosIniciales = async () => {
     try {
@@ -345,15 +355,23 @@ export function BoletasProvider({ children }: BoletasProviderProps) {
 
   const configurarNotificaciones = async (config: ConfiguracionNotificaciones): Promise<void> => {
     try {
+      console.log('Configurando notificaciones:', { habilitadas: config.habilitadas });
+      
+      // Primero guardar la configuración en AsyncStorage
+      await StorageUtils.guardarConfiguracion(config);
+      
+      // Luego actualizar el estado del contexto
       dispatch({ type: 'SET_CONFIGURACION_NOTIFICACIONES', payload: config });
       
-      // Reprogramar todas las notificaciones con la nueva configuración
+      // Finalmente reprogramar o cancelar notificaciones
       if (config.habilitadas) {
         await ServicioNotificaciones.reprogramarTodasLasNotificaciones(estado.boletas, config);
       } else {
-        // Si se deshabilitaron, cancelar todas las notificaciones
         await ServicioNotificaciones.cancelarTodasLasNotificaciones();
       }
+      
+      console.log('Configuración aplicada exitosamente');
+      
     } catch (error) {
       console.error('Error al configurar notificaciones:', error);
       dispatch({ type: 'SET_ERROR', payload: 'Error al configurar las notificaciones' });
