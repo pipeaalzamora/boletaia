@@ -13,6 +13,7 @@ import {
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colores } from "../constants/Colors";
 import { BoletasProvider } from "../context/BoletasContext";
+import { ReportesProvider } from "../context/ReportesContext";
 
 // Tema personalizado para BoletaIA
 const TemaBoletaIA = {
@@ -66,26 +67,28 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <BoletasProvider>
-          <ThemeProvider value={TemaBoletaIA}>
-            <StatusBarBackground />
-            <Stack>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="+not-found" />
-              <Stack.Screen
-                name="agregar-boleta"
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="editar-boleta"
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="configuracion-notificaciones"
-                options={{ headerShown: false }}
-              />
-            </Stack>
-            <StatusBar style="light" />
-          </ThemeProvider>
+          <ReportesProvider>
+            <ThemeProvider value={TemaBoletaIA}>
+              <StatusBarBackground />
+              <Stack>
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="+not-found" />
+                <Stack.Screen
+                  name="agregar-boleta"
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="editar-boleta"
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="configuracion-notificaciones"
+                  options={{ headerShown: false }}
+                />
+              </Stack>
+              <StatusBar style="light" />
+            </ThemeProvider>
+          </ReportesProvider>
         </BoletasProvider>
       </GestureHandlerRootView>
     </SafeAreaProvider>
