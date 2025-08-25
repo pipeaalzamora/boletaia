@@ -5,22 +5,22 @@
 
 import React, { useEffect, useState } from 'react';
 import {
-    Alert,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { EstilosBase } from '../constants/EstilosBase';
 import { Tipografia } from '../constants/Tipografia';
 import {
-    DatosFormularioBoleta,
-    ErroresValidacion,
-    PropsFormularioBoleta,
-    TipoCuenta,
-    TIPOS_CUENTA_LABELS
+  DatosFormularioBoleta,
+  ErroresValidacion,
+  PropsFormularioBoleta,
+  TipoCuenta,
+  TIPOS_CUENTA_LABELS
 } from '../types';
 import { UtilsBoleta, ValidadorBoleta } from '../utils/validaciones';
 import { BotonPrimario } from './ui/BotonPrimario';
@@ -247,11 +247,11 @@ export function FormularioBoleta({
           {/* Fecha de Corte */}
           <Selector
             tipo="fecha"
-            label="Fecha de Corte"
+            label="Fecha de Corte (Opcional)"
             value={datosFormulario.fechaCorte ? new Date(datosFormulario.fechaCorte) : undefined}
             onChangeValue={(fecha) => actualizarCampo('fechaCorte', fecha.toISOString().split('T')[0])}
             error={errores.fechaCorte}
-            requerido
+            requerido={false}
             fechaMinima={datosFormulario.fechaVencimiento ? new Date(datosFormulario.fechaVencimiento) : obtenerFechaMinima()}
             fechaMaxima={obtenerFechaMaxima()}
           />

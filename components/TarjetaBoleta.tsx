@@ -3,23 +3,23 @@
  * Incluye acciones para editar y marcar como pagada
  */
 
-import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  TouchableOpacity, 
-  StyleSheet,
-  Alert 
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import {
+  Alert,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
 
-import { TarjetaBase } from './ui/TarjetaBase';
-import { Badge, BadgeEstadoBoleta, BadgeDiasRestantes } from './ui/Badge';
-import { BotonDeslizable } from './ui/BotonDeslizable';
-import { Tipografia } from '../constants/Tipografia';
 import { Colores } from '../constants/Colors';
+import { Tipografia } from '../constants/Tipografia';
+import { PropsTarjetaBoleta } from '../types';
 import { UtilsBoleta } from '../utils/validaciones';
-import { BoletaInterface, PropsTarjetaBoleta } from '../types';
+import { BadgeDiasRestantes, BadgeEstadoBoleta } from './ui/Badge';
+import { BotonDeslizable } from './ui/BotonDeslizable';
+import { TarjetaBase } from './ui/TarjetaBase';
 
 export function TarjetaBoleta({
   boleta,
@@ -89,9 +89,19 @@ export function TarjetaBoleta({
 
   const obtenerTextoTiempoRestante = () => {
     if (boleta.estaPagada) {
-      return boleta.fechaPago 
-        ? `Pagada el ${UtilsBoleta.formatearFecha(new Date(boleta.fechaPago))}`
-        : 'Pagada';
+      if (boleta.fechaPago) {
+        try {
+          const fechaPago = new Date(boleta.fechaPago);
+          if (isNaN(fechaPago.getTime())) {
+            return 'Pagada';
+          }
+          return `Pagada el ${UtilsBoleta.formatearFecha(fechaPago)}`;
+        } catch (error) {
+          console.error('Error al formatear fecha de pago:', error);
+          return 'Pagada';
+        }
+      }
+      return 'Pagada';
     }
     return UtilsBoleta.obtenerTextoTiempoRestante(estadoCalculado.diasRestantes);
   };
@@ -147,15 +157,31 @@ export function TarjetaBoleta({
             Tipografia.fechaTarjeta,
             { color: estadoCalculado.colorEstado }
           ]}>
-            {UtilsBoleta.formatearFecha(new Date(boleta.fechaVencimiento))}
+            {(() => {
+              try {
+                const fechaVenc = new Date(boleta.fechaVencimiento);
+                return isNaN(fechaVenc.getTime()) ? 'Fecha inválida' : UtilsBoleta.formatearFecha(fechaVenc);
+              } catch (error) {
+                return 'Fecha inválida';
+              }
+            })()}
           </Text>
         </View>
-        <View style={estilos.fechaItem}>
-          <Text style={Tipografia.pequeno}>Corte</Text>
-          <Text style={Tipografia.fechaTarjeta}>
-            {UtilsBoleta.formatearFecha(new Date(boleta.fechaCorte))}
-          </Text>
-        </View>
+        {boleta.fechaCorte && (
+          <View style={estilos.fechaItem}>
+            <Text style={Tipografia.pequeno}>Corte</Text>
+            <Text style={Tipografia.fechaTarjeta}>
+              {(() => {
+                try {
+                  const fechaCorte = new Date(boleta.fechaCorte);
+                  return isNaN(fechaCorte.getTime()) ? 'Fecha inválida' : UtilsBoleta.formatearFecha(fechaCorte);
+                } catch (error) {
+                  return 'Fecha inválida';
+                }
+              })()}
+            </Text>
+          </View>
+        )}
       </View>
 
       {/* Información adicional */}
