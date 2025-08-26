@@ -7,6 +7,17 @@
     "icon": "./assets/images/icon.png",
     "scheme": "boletaia",
     "userInterfaceStyle": "automatic",
+    "linking": {
+      "prefixes": [
+        "boletaia://",
+        "exp://"
+      ],
+      "config": {
+        "screens": {
+          "auth/callback": "auth/callback"
+        }
+      }
+    },
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
@@ -37,7 +48,10 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "@react-native-google-signin/google-signin",
+      "expo-secure-store",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true
@@ -46,7 +60,8 @@
       "router": {},
       "eas": {
         "projectId": "a35dd1bc-7064-410d-a3df-33b44e27cbbc"
-      }
+      },
+      "googleServicesFile": "./google-services.json"
     },
     "owner": "pipealzamora"
   }
