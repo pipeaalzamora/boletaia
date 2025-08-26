@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { useRouter } from 'expo-router';
 
+import { useAuth } from '../../context/AuthContext';
 import { useBoletasContext } from '../../context/BoletasContext';
 import { EstilosBase } from '../../constants/EstilosBase';
 import { Tipografia } from '../../constants/Tipografia';
@@ -25,10 +26,18 @@ import { TarjetaConfiguracion } from '../../components/ui/TarjetaBase';
 export default function ConfiguracionScreen() {
   const router = useRouter();
   const { 
-    usuario,
+    usuario: usuarioAuth,
+    estaAutenticado,
+    cargandoAuth 
+  } = useAuth();
+  const { 
+    usuario: usuarioLocal,
     configuracionNotificaciones,
     configurarNotificaciones 
   } = useBoletasContext();
+
+  // Usar usuario autenticado si está disponible, sino usar usuario local
+  const usuario = usuarioAuth || usuarioLocal;
 
   const manejarCambioNotificacion = async (campo: string, valor: boolean) => {
     if (configuracionNotificaciones) {
@@ -109,21 +118,64 @@ export default function ConfiguracionScreen() {
         {/* Información del usuario */}
         <View style={estilos.seccion}>
           <Text style={Tipografia.subtitulo}>Perfil</Text>
-          <TarjetaConfiguracion estiloPersonalizado={estilos.perfilContainer}>
-            <View style={estilos.perfilContent}>
-              <View style={estilos.avatarContainer}>
-                <Ionicons name="person" size={32} color={Colores.naranja} />
-              </View>
-              <View style={estilos.perfilInfo}>
-                <Text style={Tipografia.tituloTarjeta}>
-                  {usuario?.nombre || 'Usuario'}
-                </Text>
-                <Text style={Tipografia.pequeno}>
-                  {usuario?.email || 'usuario@boletaia.app'}
-                </Text>
-              </View>
-            </View>
-          </TarjetaConfiguracion>
+          
+          {estaAutenticado ? (
+            <TouchableOpacity onPress={() => router.push('/perfil')}>
+              <TarjetaConfiguracion estiloPersonalizado={estilos.perfilContainer}>
+                <View style={estilos.perfilContent}>
+                  <View style={estilos.avatarContainer}>
+                    <Ionicons name="person" size={32} color={Colores.naranja} />
+                  </View>
+                  <View style={estilos.perfilInfo}>
+                    <Text style={Tipografia.tituloTarjeta}>
+                      {usuario?.nombre || 'Usuario'}
+                    </Text>
+                    <Text style={Tipografia.pequeno}>
+                      {usuario?.email || 'usuario@boletaia.app'}
+                    </Text>
+                    <Text style={[Tipografia.pequeno, { color: Colores.verde, marginTop: 4 }]}>
+                      ✓ Cuenta de Google
+                    </Text>
+                  </View>
+                  <Ionicons 
+                    name="chevron-forward" 
+                    size={20} 
+                    color={Colores.textoGrisMedio} 
+                  />
+                </View>
+              </TarjetaConfiguracion>
+            </TouchableOpacity>
+          ) : (
+            <>
+              <TarjetaConfiguracion estiloPersonalizado={estilos.perfilContainer}>
+                <View style={estilos.perfilContent}>
+                  <View style={estilos.avatarContainer}>
+                    <Ionicons name="person-outline" size={32} color={Colores.textoGrisMedio} />
+                  </View>
+                  <View style={estilos.perfilInfo}>
+                    <Text style={Tipografia.tituloTarjeta}>
+                      {usuario?.nombre || 'Usuario Invitado'}
+                    </Text>
+                    <Text style={Tipografia.pequeno}>
+                      Sin cuenta vinculada
+                    </Text>
+                  </View>
+                </View>
+              </TarjetaConfiguracion>
+              
+              <TouchableOpacity 
+                onPress={() => router.push('/login')}
+                style={{ marginTop: 12 }}
+              >
+                <OpcionConfiguracion
+                  titulo="Iniciar Sesión con Google"
+                  descripcion="Sincroniza tus datos en la nube"
+                  icono="logo-google"
+                  tipo="navegacion"
+                />
+              </TouchableOpacity>
+            </>
+          )}
         </View>
 
         {/* Notificaciones */}
