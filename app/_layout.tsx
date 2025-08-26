@@ -6,12 +6,13 @@ import { Platform, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
+    SafeAreaProvider,
+    useSafeAreaInsets,
 } from "react-native-safe-area-context";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colores } from "../constants/Colors";
+import { AuthProvider } from "../context/AuthContext";
 import { BoletasProvider } from "../context/BoletasContext";
 import { ReportesProvider } from "../context/ReportesContext";
 
@@ -66,30 +67,51 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <BoletasProvider>
-          <ReportesProvider>
-            <ThemeProvider value={TemaBoletaIA}>
-              <StatusBarBackground />
-              <Stack>
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen name="+not-found" />
-                <Stack.Screen
-                  name="agregar-boleta"
-                  options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                  name="editar-boleta"
-                  options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                  name="configuracion-notificaciones"
-                  options={{ headerShown: false }}
-                />
-              </Stack>
-              <StatusBar style="light" />
-            </ThemeProvider>
-          </ReportesProvider>
-        </BoletasProvider>
+        <AuthProvider>
+          <BoletasProvider>
+            <ReportesProvider>
+              <ThemeProvider value={TemaBoletaIA}>
+                <StatusBarBackground />
+                <Stack>
+                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                  <Stack.Screen name="+not-found" />
+                  <Stack.Screen
+                    name="login"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="registro"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="auth/callback"
+                    options={{ 
+                      headerShown: false,
+                      gestureEnabled: false // Evitar que el usuario pueda regresar manualmente
+                    }}
+                  />
+                  <Stack.Screen
+                    name="perfil"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="agregar-boleta"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="editar-boleta"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="configuracion-notificaciones"
+                    options={{ headerShown: false }}
+                  />
+                </Stack>
+                <StatusBar style="light" />
+              </ThemeProvider>
+            </ReportesProvider>
+          </BoletasProvider>
+        </AuthProvider>
       </GestureHandlerRootView>
     </SafeAreaProvider>
   );
