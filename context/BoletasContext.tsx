@@ -1,6 +1,7 @@
 /**
  * Context Provider para BoletaIA
  * Gestión global de estado para boletas, usuarios y configuraciones
+ * Integrado con sistema de autenticación
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -15,6 +16,7 @@ import {
   NuevaBoleta,
   UsuarioInterface,
 } from '../types';
+import { useAuth } from './AuthContext';
 
 // Tipos para el reducer
 type AccionBoletas =
@@ -201,6 +203,7 @@ interface BoletasProviderProps {
 
 export function BoletasProvider({ children }: BoletasProviderProps) {
   const [estado, dispatch] = useReducer(boletasReducer, estadoInicial);
+  const { usuario: usuarioAuth, estaAutenticado } = useAuth();
 
   // Cargar datos al inicializar
   useEffect(() => {
@@ -267,10 +270,13 @@ export function BoletasProvider({ children }: BoletasProviderProps) {
     try {
       dispatch({ type: 'SET_CARGANDO', payload: true });
       
+      // Usar usuario autenticado si está disponible, sino usar el usuario del estado local
+      const usuarioId = usuarioAuth?.id || estado.usuario?.id || 'usuario_temporal';
+      
       // Crear la boleta con datos completos
       const boleta: BoletaInterface = {
         id: `boleta_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        usuarioId: estado.usuario?.id || 'usuario_temporal',
+        usuarioId: usuarioId,
         ...nuevaBoleta,
         estaPagada: false,
         fechaCreacion: new Date(),
