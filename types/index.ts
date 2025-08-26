@@ -5,25 +5,25 @@
 
 // Enumeraciones
 export enum TipoCuenta {
-  LUZ = 'luz',
-  AGUA = 'agua',
-  GAS = 'gas',
-  INTERNET = 'internet',
-  INTERNET_MOVIL = 'internet_movil',
-  GASTOS_COMUNES = 'gastos_comunes',
+  LUZ = "luz",
+  AGUA = "agua",
+  GAS = "gas",
+  INTERNET = "internet",
+  INTERNET_MOVIL = "internet_movil",
+  GASTOS_COMUNES = "gastos_comunes",
 }
 
 export enum EstadoBoleta {
-  PENDIENTE = 'pendiente',
-  PAGADA = 'pagada',
-  VENCIDA = 'vencida',
-  PROXIMA = 'proxima',
+  PENDIENTE = "pendiente",
+  PAGADA = "pagada",
+  VENCIDA = "vencida",
+  PROXIMA = "proxima",
 }
 
 export enum TipoNotificacion {
-  TRES_DIAS_ANTES = 'tres_dias_antes',
-  UNA_SEMANA_ANTES = 'una_semana_antes',
-  EL_MISMO_DIA = 'mismo_dia',
+  TRES_DIAS_ANTES = "tres_dias_antes",
+  UNA_SEMANA_ANTES = "una_semana_antes",
+  EL_MISMO_DIA = "mismo_dia",
 }
 
 // Interfaces principales
@@ -51,6 +51,11 @@ export interface UsuarioInterface {
   telefono?: string;
   fechaRegistro: Date;
   configuracionNotificaciones: ConfiguracionNotificaciones;
+  // Campos para autenticación con Supabase
+  avatarUrl?: string;
+  tipoAutenticacion: "google" | "email" | "invitado";
+  ultimaConexion: Date;
+  configuracionPrivacidad?: ConfiguracionPrivacidad;
 }
 
 export interface ConfiguracionNotificaciones {
@@ -60,6 +65,13 @@ export interface ConfiguracionNotificaciones {
   elMismoDia: boolean;
   horaNotificacion: string; // Formato HH:mm
   habilitadas: boolean;
+}
+
+export interface ConfiguracionPrivacidad {
+  compartirEmail: boolean;
+  compartirNombre: boolean;
+  respaldoAutomatico: boolean;
+  sincronizacionDispositivos: boolean;
 }
 
 export interface NotificacionInterface {
@@ -99,7 +111,7 @@ export interface ActualizacionBoleta {
 }
 
 export interface DatosFormularioBoleta {
-  tipoCuenta: TipoCuenta | '';
+  tipoCuenta: TipoCuenta | "";
   nombreEmpresa: string;
   monto: string;
   fechaEmision: string;
@@ -130,17 +142,68 @@ export interface EstadoBoletasContexto {
   configuracionNotificaciones: ConfiguracionNotificaciones | null;
 }
 
+// Nuevos tipos para autenticación
+export interface EstadoAuth {
+  estaAutenticado: boolean;
+  usuario: UsuarioInterface | null;
+  cargandoAuth: boolean;
+  errorAuth: string | null;
+  sesionToken: string | null;
+}
+
+export interface AccionesAuth {
+  iniciarSesionConGoogle: () => Promise<void>;
+  procesarCallbackOAuth: (usuario: UsuarioInterface) => Promise<void>;
+  cerrarSesion: () => Promise<void>;
+  verificarSesion: () => Promise<boolean>;
+  actualizarPerfil: (datos: ActualizacionPerfil) => Promise<void>;
+}
+
+export interface ActualizacionPerfil {
+  nombre?: string;
+  email?: string;
+  telefono?: string;
+  configuracionPrivacidad?: ConfiguracionPrivacidad;
+  configuracionNotificaciones?: ConfiguracionNotificaciones;
+}
+
 export interface AccionesBoletasContexto {
   cargarBoletas: () => Promise<void>;
   agregarBoleta: (nuevaBoleta: NuevaBoleta) => Promise<BoletaInterface>;
-  actualizarBoleta: (id: string, datos: ActualizacionBoleta) => Promise<BoletaInterface>;
+  actualizarBoleta: (
+    id: string,
+    datos: ActualizacionBoleta
+  ) => Promise<BoletaInterface>;
   marcarComoPagada: (id: string) => Promise<BoletaInterface>;
   eliminarBoleta: (id: string) => Promise<void>;
-  configurarNotificaciones: (config: ConfiguracionNotificaciones) => Promise<void>;
+  configurarNotificaciones: (
+    config: ConfiguracionNotificaciones
+  ) => Promise<void>;
   setError: (error: string | null) => void;
 }
 
-// Tipos para navegación (actualizados para incluir reportes)
+// Tipos para autenticación con Google
+// Tipos para autenticación con Supabase
+export interface DatosRegistro {
+  email: string;
+  password: string;
+  nombreCompleto: string;
+}
+
+export interface DatosLogin {
+  email: string;
+  password: string;
+}
+
+// Tipos para migración de datos
+export interface ResultadoMigracion {
+  exito: boolean;
+  boletasMigradas: number;
+  errores: string[];
+  mensaje: string;
+}
+
+// Tipos para navegación (actualizados para incluir reportes y autenticación)
 export type RootStackParamList = {
   Dashboard: undefined;
   Reportes: undefined;
@@ -150,12 +213,15 @@ export type RootStackParamList = {
   VistaReporte: { rutaArchivo: string };
   Configuracion: undefined;
   ConfiguracionNotificaciones: undefined;
+  Login: undefined;
+  Perfil: undefined;
 };
 
 export type TabParamList = {
   dashboard: undefined;
   reportes: undefined;
   configuracion: undefined;
+  perfil: undefined;
 };
 
 // Tipos para componentes
@@ -250,7 +316,7 @@ export interface ConfiguracionAplicacion {
   maximoBoletasPorUsuario: number;
   formatoFecha: string;
   formatoMoneda: string;
-  idioma: 'es' | 'en';
+  idioma: "es" | "en";
 }
 
 // Tipos para manejo de errores
@@ -261,46 +327,46 @@ export interface ErrorAplicacion {
   timestamp: Date;
 }
 
-export type TipoError = 
-  | 'VALIDACION'
-  | 'NETWORK'
-  | 'AUTH'
-  | 'STORAGE'
-  | 'NOTIFICACION'
-  | 'GENERAL';
+export type TipoError =
+  | "VALIDACION"
+  | "NETWORK"
+  | "AUTH"
+  | "STORAGE"
+  | "NOTIFICACION"
+  | "GENERAL";
 
 // Constantes de tipos
 export const TIPOS_CUENTA_LABELS: Record<TipoCuenta, string> = {
-  [TipoCuenta.LUZ]: 'Luz',
-  [TipoCuenta.AGUA]: 'Agua',
-  [TipoCuenta.GAS]: 'Gas',
-  [TipoCuenta.INTERNET]: 'Internet',
-  [TipoCuenta.INTERNET_MOVIL]: 'Internet Móvil',
-  [TipoCuenta.GASTOS_COMUNES]: 'Gastos Comunes',
+  [TipoCuenta.LUZ]: "Luz",
+  [TipoCuenta.AGUA]: "Agua",
+  [TipoCuenta.GAS]: "Gas",
+  [TipoCuenta.INTERNET]: "Internet",
+  [TipoCuenta.INTERNET_MOVIL]: "Internet Móvil",
+  [TipoCuenta.GASTOS_COMUNES]: "Gastos Comunes",
 };
 
 export const ESTADOS_BOLETA_LABELS: Record<EstadoBoleta, string> = {
-  [EstadoBoleta.PENDIENTE]: 'Pendiente',
-  [EstadoBoleta.PAGADA]: 'Pagada',
-  [EstadoBoleta.VENCIDA]: 'Vencida',
-  [EstadoBoleta.PROXIMA]: 'Próxima',
+  [EstadoBoleta.PENDIENTE]: "Pendiente",
+  [EstadoBoleta.PAGADA]: "Pagada",
+  [EstadoBoleta.VENCIDA]: "Vencida",
+  [EstadoBoleta.PROXIMA]: "Próxima",
 };
 
 export const TIPOS_NOTIFICACION_LABELS: Record<TipoNotificacion, string> = {
-  [TipoNotificacion.TRES_DIAS_ANTES]: '3 días antes',
-  [TipoNotificacion.UNA_SEMANA_ANTES]: '1 semana antes',
-  [TipoNotificacion.EL_MISMO_DIA]: 'El mismo día',
+  [TipoNotificacion.TRES_DIAS_ANTES]: "3 días antes",
+  [TipoNotificacion.UNA_SEMANA_ANTES]: "1 semana antes",
+  [TipoNotificacion.EL_MISMO_DIA]: "El mismo día",
 };
 
 // === TIPOS PARA SISTEMA DE REPORTES ===
 
 // Tipos para rangos de fechas predefinidos
 export enum RangoFechas {
-  ULTIMO_MES = 'ultimo_mes',
-  ULTIMOS_TRES_MESES = 'ultimos_tres_meses',
-  ULTIMO_SEMESTRE = 'ultimo_semestre',
-  ULTIMO_ANO = 'ultimo_ano',
-  PERSONALIZADO = 'personalizado',
+  ULTIMO_MES = "ultimo_mes",
+  ULTIMOS_TRES_MESES = "ultimos_tres_meses",
+  ULTIMO_SEMESTRE = "ultimo_semestre",
+  ULTIMO_ANO = "ultimo_ano",
+  PERSONALIZADO = "personalizado",
 }
 
 // Configuración de reporte
@@ -311,8 +377,8 @@ export interface ConfiguracionReporte {
   filtros: FiltrosReporte;
   incluirGraficos: boolean;
   incluirResumen: boolean;
-  formatoFecha: 'dd/mm/yyyy' | 'mm/dd/yyyy';
-  formatoMoneda: 'CLP' | 'USD';
+  formatoFecha: "dd/mm/yyyy" | "mm/dd/yyyy";
+  formatoMoneda: "CLP" | "USD";
   fechaCreacion: Date;
   fechaActualizacion: Date;
 }
@@ -414,14 +480,18 @@ export interface PropsSelectorRangoFechas {
   rangoSeleccionado: RangoFechas;
   fechaInicio: Date;
   fechaFin: Date;
-  onCambiarRango: (rango: RangoFechas, fechaInicio?: Date, fechaFin?: Date) => void;
+  onCambiarRango: (
+    rango: RangoFechas,
+    fechaInicio?: Date,
+    fechaFin?: Date
+  ) => void;
 }
 
 // Constantes para reportes
 export const RANGOS_FECHAS_LABELS: Record<RangoFechas, string> = {
-  [RangoFechas.ULTIMO_MES]: 'Último mes',
-  [RangoFechas.ULTIMOS_TRES_MESES]: 'Últimos 3 meses',
-  [RangoFechas.ULTIMO_SEMESTRE]: 'Último semestre',
-  [RangoFechas.ULTIMO_ANO]: 'Último año',
-  [RangoFechas.PERSONALIZADO]: 'Personalizado',
+  [RangoFechas.ULTIMO_MES]: "Último mes",
+  [RangoFechas.ULTIMOS_TRES_MESES]: "Últimos 3 meses",
+  [RangoFechas.ULTIMO_SEMESTRE]: "Último semestre",
+  [RangoFechas.ULTIMO_ANO]: "Último año",
+  [RangoFechas.PERSONALIZADO]: "Personalizado",
 };
