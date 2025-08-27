@@ -4,37 +4,20 @@
     "slug": "boletaia",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/Icon.png",
     "scheme": "boletaia",
     "userInterfaceStyle": "automatic",
-    "linking": {
-      "prefixes": ["boletaia://", "exp://"],
-      "config": {
-        "screens": {
-          "auth/callback": "auth/callback"
-        }
-      }
-    },
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
     },
     "android": {
-      "package": "com.pipealzamora.boletaia",
-      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "statusBar": {
-        "style": "light",
-        "translucent": true
-      },
-      "permissions": [
-        "android.permission.INTERNET",
-        "android.permission.ACCESS_NETWORK_STATE"
-      ]
+      "package": "com.pipealzamora.boletaia"
     },
     "web": {
       "bundler": "metro",
@@ -52,7 +35,7 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "@react-native-google-signin/google-signin",
+
       "expo-secure-store",
       "expo-web-browser"
     ],
@@ -63,8 +46,7 @@
       "router": {},
       "eas": {
         "projectId": "a35dd1bc-7064-410d-a3df-33b44e27cbbc"
-      },
-      "googleServicesFile": "./google-services.json"
+      }
     },
     "owner": "pipealzamora"
   }
