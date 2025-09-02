@@ -51,11 +51,6 @@ export interface UsuarioInterface {
   telefono?: string;
   fechaRegistro: Date;
   configuracionNotificaciones: ConfiguracionNotificaciones;
-  // Campos para autenticación con Supabase
-  avatarUrl?: string;
-  tipoAutenticacion: "google" | "email" | "invitado";
-  ultimaConexion: Date;
-  configuracionPrivacidad?: ConfiguracionPrivacidad;
 }
 
 export interface ConfiguracionNotificaciones {
@@ -142,28 +137,10 @@ export interface EstadoBoletasContexto {
   configuracionNotificaciones: ConfiguracionNotificaciones | null;
 }
 
-// Nuevos tipos para autenticación
-export interface EstadoAuth {
-  estaAutenticado: boolean;
-  usuario: UsuarioInterface | null;
-  cargandoAuth: boolean;
-  errorAuth: string | null;
-  sesionToken: string | null;
-}
-
-export interface AccionesAuth {
-  iniciarSesionConGoogle: () => Promise<void>;
-  procesarCallbackOAuth: (usuario: UsuarioInterface) => Promise<void>;
-  cerrarSesion: () => Promise<void>;
-  verificarSesion: () => Promise<boolean>;
-  actualizarPerfil: (datos: ActualizacionPerfil) => Promise<void>;
-}
-
 export interface ActualizacionPerfil {
   nombre?: string;
   email?: string;
   telefono?: string;
-  configuracionPrivacidad?: ConfiguracionPrivacidad;
   configuracionNotificaciones?: ConfiguracionNotificaciones;
 }
 
@@ -180,19 +157,6 @@ export interface AccionesBoletasContexto {
     config: ConfiguracionNotificaciones
   ) => Promise<void>;
   setError: (error: string | null) => void;
-}
-
-// Tipos para autenticación con Google
-// Tipos para autenticación con Supabase
-export interface DatosRegistro {
-  email: string;
-  password: string;
-  nombreCompleto: string;
-}
-
-export interface DatosLogin {
-  email: string;
-  password: string;
 }
 
 // Tipos para migración de datos
@@ -213,7 +177,6 @@ export type RootStackParamList = {
   VistaReporte: { rutaArchivo: string };
   Configuracion: undefined;
   ConfiguracionNotificaciones: undefined;
-  Login: undefined;
   Perfil: undefined;
 };
 
@@ -221,7 +184,6 @@ export type TabParamList = {
   dashboard: undefined;
   reportes: undefined;
   configuracion: undefined;
-  perfil: undefined;
 };
 
 // Tipos para componentes
