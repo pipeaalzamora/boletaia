@@ -1,0 +1,65 @@
+export default {
+  expo: {
+    name: "boletaia",
+    slug: "boletaia",
+    version: "1.0.0",
+    orientation: "portrait",
+    icon: "./assets/images/Icon.png",
+    scheme: "boletaia",
+    userInterfaceStyle: "automatic",
+    newArchEnabled: true,
+    ios: {
+      supportsTablet: true,
+    },
+    android: {
+      adaptiveIcon: {
+        foregroundImage: "./assets/images/adaptive-icon.png",
+        backgroundColor: "#ffffff",
+      },
+      edgeToEdgeEnabled: true,
+      package: "com.pipealzamora.boletaia",
+      versionCode: 1,
+      permissions: [
+        "INTERNET",
+        "ACCESS_NETWORK_STATE",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_EXTERNAL_STORAGE",
+      ],
+      allowBackup: false,
+    },
+    web: {
+      bundler: "metro",
+      output: "static",
+      favicon: "./assets/images/favicon.png",
+    },
+    plugins: [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          image: "./assets/images/splash-icon.png",
+          imageWidth: 200,
+          resizeMode: "contain",
+          backgroundColor: "#ffffff",
+        },
+      ],
+      "expo-secure-store",
+      "expo-web-browser",
+    ],
+    experiments: {
+      typedRoutes: true,
+    },
+    extra: {
+      router: {},
+      eas: {
+        projectId: "a35dd1bc-7064-410d-a3df-33b44e27cbbc",
+      },
+    },
+    owner: "pipealzamora",
+    // Configuraciones específicas para producción
+    updates: {
+      fallbackToCacheTimeout: 0,
+    },
+    assetBundlePatterns: ["**/*"],
+  },
+};
