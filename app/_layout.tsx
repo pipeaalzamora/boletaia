@@ -6,13 +6,14 @@ import { Platform, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 import {
-    SafeAreaProvider,
-    useSafeAreaInsets,
+  SafeAreaProvider,
+  useSafeAreaInsets,
 } from "react-native-safe-area-context";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { ErrorBoundary } from "../components/ErrorBoundary";
+import { LoadingScreen } from "../components/LoadingScreen";
 import { Colores } from "../constants/Colors";
-import { AuthProvider } from "../context/AuthContext";
 import { BoletasProvider } from "../context/BoletasContext";
 import { ReportesProvider } from "../context/ReportesContext";
 
@@ -55,64 +56,41 @@ function StatusBarBackground() {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
+  const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
+  // Manejar errores de carga de fuentes
+  if (error) {
+    console.error("Error loading fonts:", error);
+  }
+
+  if (!loaded && !error) {
+    // Mostrar pantalla de carga mientras se cargan las fuentes
+    return <LoadingScreen message="Cargando fuentes..." />;
   }
 
   return (
-    <SafeAreaProvider>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <AuthProvider>
+    <ErrorBoundary>
+      <SafeAreaProvider>
+        <GestureHandlerRootView style={{ flex: 1 }}>
           <BoletasProvider>
             <ReportesProvider>
               <ThemeProvider value={TemaBoletaIA}>
                 <StatusBarBackground />
                 <Stack>
-                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                  <Stack.Screen
+                    name="(tabs)"
+                    options={{ headerShown: false }}
+                  />
                   <Stack.Screen name="+not-found" />
-                  <Stack.Screen
-                    name="login"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="registro"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="auth/callback"
-                    options={{ 
-                      headerShown: false,
-                      gestureEnabled: false // Evitar que el usuario pueda regresar manualmente
-                    }}
-                  />
-                  <Stack.Screen
-                    name="perfil"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="agregar-boleta"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="editar-boleta"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="configuracion-notificaciones"
-                    options={{ headerShown: false }}
-                  />
                 </Stack>
                 <StatusBar style="light" />
               </ThemeProvider>
             </ReportesProvider>
           </BoletasProvider>
-        </AuthProvider>
-      </GestureHandlerRootView>
-    </SafeAreaProvider>
+        </GestureHandlerRootView>
+      </SafeAreaProvider>
+    </ErrorBoundary>
   );
 }

@@ -2,42 +2,30 @@
  * Pantalla Configuración - Configuraciones de la aplicación BoletaIA
  */
 
-import React from 'react';
-import { 
-  View, 
-  Text, 
-  ScrollView, 
-  TouchableOpacity,
+import { Ionicons } from "@expo/vector-icons";
+import React from "react";
+import {
+  ScrollView,
   StyleSheet,
-  Switch
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { useRouter } from 'expo-router';
+import { useRouter } from "expo-router";
 
-import { useAuth } from '../../context/AuthContext';
-import { useBoletasContext } from '../../context/BoletasContext';
-import { EstilosBase } from '../../constants/EstilosBase';
-import { Tipografia } from '../../constants/Tipografia';
-import { Colores } from '../../constants/Colors';
-import { TarjetaConfiguracion } from '../../components/ui/TarjetaBase';
+import { TarjetaConfiguracion } from "../../components/ui/TarjetaBase";
+import { Colores } from "../../constants/Colors";
+import { EstilosBase } from "../../constants/EstilosBase";
+import { Tipografia } from "../../constants/Tipografia";
+import { useBoletasContext } from "../../context/BoletasContext";
 
 export default function ConfiguracionScreen() {
   const router = useRouter();
-  const { 
-    usuario: usuarioAuth,
-    estaAutenticado,
-    cargandoAuth 
-  } = useAuth();
-  const { 
-    usuario: usuarioLocal,
-    configuracionNotificaciones,
-    configurarNotificaciones 
-  } = useBoletasContext();
-
-  // Usar usuario autenticado si está disponible, sino usar usuario local
-  const usuario = usuarioAuth || usuarioLocal;
+  const { usuario, configuracionNotificaciones, configurarNotificaciones } =
+    useBoletasContext();
 
   const manejarCambioNotificacion = async (campo: string, valor: boolean) => {
     if (configuracionNotificaciones) {
@@ -47,33 +35,33 @@ export default function ConfiguracionScreen() {
           [campo]: valor,
         });
       } catch (error) {
-        console.error('Error al actualizar configuración:', error);
+        console.error("Error al actualizar configuración:", error);
       }
     }
   };
 
-  const OpcionConfiguracion = ({ 
-    titulo, 
-    descripcion, 
-    icono, 
-    valor, 
+  const OpcionConfiguracion = ({
+    titulo,
+    descripcion,
+    icono,
+    valor,
     onCambio,
-    tipo = 'switch'
+    tipo = "switch",
   }: {
     titulo: string;
     descripcion?: string;
     icono: string;
     valor?: boolean;
     onCambio?: (valor: boolean) => void;
-    tipo?: 'switch' | 'navegacion';
+    tipo?: "switch" | "navegacion";
   }) => (
     <TarjetaConfiguracion estiloPersonalizado={estilos.opcionContainer}>
       <View style={estilos.opcionContent}>
         <View style={estilos.opcionInfo}>
-          <Ionicons 
-            name={icono as any} 
-            size={24} 
-            color={Colores.naranja} 
+          <Ionicons
+            name={icono as any}
+            size={24}
+            color={Colores.naranja}
             style={estilos.opcionIcono}
           />
           <View style={estilos.opcionTexto}>
@@ -83,21 +71,24 @@ export default function ConfiguracionScreen() {
             )}
           </View>
         </View>
-        
-        {tipo === 'switch' && onCambio && (
+
+        {tipo === "switch" && onCambio && (
           <Switch
             value={valor || false}
             onValueChange={onCambio}
-            trackColor={{ false: Colores.grisMedio, true: Colores.naranja + '80' }}
+            trackColor={{
+              false: Colores.grisMedio,
+              true: Colores.naranja + "80",
+            }}
             thumbColor={valor ? Colores.naranja : Colores.grisClaro}
           />
         )}
-        
-        {tipo === 'navegacion' && (
-          <Ionicons 
-            name="chevron-forward" 
-            size={20} 
-            color={Colores.textoGrisMedio} 
+
+        {tipo === "navegacion" && (
+          <Ionicons
+            name="chevron-forward"
+            size={20}
+            color={Colores.textoGrisMedio}
           />
         )}
       </View>
@@ -106,7 +97,7 @@ export default function ConfiguracionScreen() {
 
   return (
     <SafeAreaView style={EstilosBase.contenedorPrincipal}>
-      <ScrollView 
+      <ScrollView
         style={EstilosBase.contenedorConPadding}
         showsVerticalScrollIndicator={false}
       >
@@ -118,71 +109,46 @@ export default function ConfiguracionScreen() {
         {/* Información del usuario */}
         <View style={estilos.seccion}>
           <Text style={Tipografia.subtitulo}>Perfil</Text>
-          
-          {estaAutenticado ? (
-            <TouchableOpacity onPress={() => router.push('/perfil')}>
-              <TarjetaConfiguracion estiloPersonalizado={estilos.perfilContainer}>
-                <View style={estilos.perfilContent}>
-                  <View style={estilos.avatarContainer}>
-                    <Ionicons name="person" size={32} color={Colores.naranja} />
-                  </View>
-                  <View style={estilos.perfilInfo}>
-                    <Text style={Tipografia.tituloTarjeta}>
-                      {usuario?.nombre || 'Usuario'}
-                    </Text>
-                    <Text style={Tipografia.pequeno}>
-                      {usuario?.email || 'usuario@boletaia.app'}
-                    </Text>
-                    <Text style={[Tipografia.pequeno, { color: Colores.verde, marginTop: 4 }]}>
-                      ✓ Cuenta de Google
-                    </Text>
-                  </View>
-                  <Ionicons 
-                    name="chevron-forward" 
-                    size={20} 
-                    color={Colores.textoGrisMedio} 
-                  />
+
+          <TouchableOpacity onPress={() => router.push("/perfil")}>
+            <TarjetaConfiguracion estiloPersonalizado={estilos.perfilContainer}>
+              <View style={estilos.perfilContent}>
+                <View style={estilos.avatarContainer}>
+                  <Ionicons name="person" size={32} color={Colores.naranja} />
                 </View>
-              </TarjetaConfiguracion>
-            </TouchableOpacity>
-          ) : (
-            <>
-              <TarjetaConfiguracion estiloPersonalizado={estilos.perfilContainer}>
-                <View style={estilos.perfilContent}>
-                  <View style={estilos.avatarContainer}>
-                    <Ionicons name="person-outline" size={32} color={Colores.textoGrisMedio} />
-                  </View>
-                  <View style={estilos.perfilInfo}>
-                    <Text style={Tipografia.tituloTarjeta}>
-                      {usuario?.nombre || 'Usuario Invitado'}
-                    </Text>
-                    <Text style={Tipografia.pequeno}>
-                      Sin cuenta vinculada
-                    </Text>
-                  </View>
+                <View style={estilos.perfilInfo}>
+                  <Text style={Tipografia.tituloTarjeta}>
+                    {usuario?.nombre || "Usuario"}
+                  </Text>
+                  <Text style={Tipografia.pequeno}>
+                    {usuario?.email || "usuario@boletaia.app"}
+                  </Text>
+                  <Text
+                    style={[
+                      Tipografia.pequeno,
+                      { color: Colores.azul, marginTop: 4 },
+                    ]}
+                  >
+                    ✓ Usuario Local
+                  </Text>
                 </View>
-              </TarjetaConfiguracion>
-              
-              <TouchableOpacity 
-                onPress={() => router.push('/login')}
-                style={{ marginTop: 12 }}
-              >
-                <OpcionConfiguracion
-                  titulo="Iniciar Sesión con Google"
-                  descripcion="Sincroniza tus datos en la nube"
-                  icono="logo-google"
-                  tipo="navegacion"
+                <Ionicons
+                  name="chevron-forward"
+                  size={20}
+                  color={Colores.textoGrisMedio}
                 />
-              </TouchableOpacity>
-            </>
-          )}
+              </View>
+            </TarjetaConfiguracion>
+          </TouchableOpacity>
         </View>
 
         {/* Notificaciones */}
         <View style={estilos.seccion}>
           <Text style={Tipografia.subtitulo}>Notificaciones</Text>
-          
-          <TouchableOpacity onPress={() => router.push('/configuracion-notificaciones')}>
+
+          <TouchableOpacity
+            onPress={() => router.push("/configuracion-notificaciones")}
+          >
             <OpcionConfiguracion
               titulo="Configurar Notificaciones"
               descripcion="Personaliza alertas y recordatorios"
@@ -190,10 +156,13 @@ export default function ConfiguracionScreen() {
               tipo="navegacion"
             />
           </TouchableOpacity>
-          
+
           <View style={estilos.resumenNotificaciones}>
             <Text style={Tipografia.pequeno}>
-              Estado: {configuracionNotificaciones?.habilitadas ? 'Activadas' : 'Desactivadas'}
+              Estado:{" "}
+              {configuracionNotificaciones?.habilitadas
+                ? "Activadas"
+                : "Desactivadas"}
             </Text>
             {configuracionNotificaciones?.habilitadas && (
               <Text style={Tipografia.pequeno}>
@@ -206,7 +175,7 @@ export default function ConfiguracionScreen() {
         {/* Aplicación */}
         <View style={estilos.seccion}>
           <Text style={Tipografia.subtitulo}>Aplicación</Text>
-          
+
           <TouchableOpacity>
             <OpcionConfiguracion
               titulo="Sobre BoletaIA"
@@ -215,7 +184,7 @@ export default function ConfiguracionScreen() {
               tipo="navegacion"
             />
           </TouchableOpacity>
-          
+
           <TouchableOpacity>
             <OpcionConfiguracion
               titulo="Ayuda"
@@ -228,9 +197,7 @@ export default function ConfiguracionScreen() {
 
         {/* Información de la app */}
         <View style={estilos.infoApp}>
-          <Text style={Tipografia.pequeno}>
-            BoletaIA v1.0.0
-          </Text>
+          <Text style={Tipografia.pequeno}>BoletaIA v1.0.0</Text>
           <Text style={[Tipografia.pequeno, { marginTop: 4 }]}>
             Gestiona tus boletas de servicios básicos
           </Text>
@@ -251,16 +218,16 @@ const estilos = StyleSheet.create({
     marginTop: 16,
   },
   perfilContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   avatarContainer: {
     width: 60,
     height: 60,
     borderRadius: 30,
     backgroundColor: Colores.fondoInput,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 16,
   },
   perfilInfo: {
@@ -270,13 +237,13 @@ const estilos = StyleSheet.create({
     marginTop: 8,
   },
   opcionContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   opcionInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     flex: 1,
   },
   opcionIcono: {
@@ -286,7 +253,7 @@ const estilos = StyleSheet.create({
     flex: 1,
   },
   infoApp: {
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 32,
     marginBottom: 32,
   },
