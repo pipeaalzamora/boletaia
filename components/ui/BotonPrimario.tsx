@@ -3,24 +3,30 @@
  * Diseño vanguardista negro/naranja para BoletaIA
  */
 
-import React from 'react';
-import { TouchableOpacity, Text, ActivityIndicator, ViewStyle, TextStyle } from 'react-native';
-import { EstilosBase } from '../../constants/EstilosBase';
-import { Tipografia } from '../../constants/Tipografia';
-import { Colores } from '../../constants/Colors';
+import React from "react";
+import {
+  ActivityIndicator,
+  Text,
+  TextStyle,
+  TouchableOpacity,
+  ViewStyle,
+} from "react-native";
+import { Colores } from "../../constants/Colors";
+import { EstilosBase } from "../../constants/EstilosBase";
+import { Tipografia } from "../../constants/Tipografia";
 
 export interface PropsBotonPrimario {
   titulo: string;
   onPress: () => void;
   deshabilitado?: boolean;
   cargando?: boolean;
-  tipo?: 'primario' | 'secundario' | 'peligro' | 'exito';
-  tamano?: 'pequeno' | 'mediano' | 'grande';
-  ancho?: 'completo' | 'ajustado';
+  tipo?: "primario" | "secundario" | "peligro" | "exito";
+  tamano?: "pequeno" | "mediano" | "grande";
+  ancho?: "completo" | "ajustado";
   estiloPersonalizado?: ViewStyle;
   estiloTextoPersonalizado?: TextStyle;
   icono?: React.ReactNode;
-  posicionIcono?: 'izquierda' | 'derecha';
+  posicionIcono?: "izquierda" | "derecha";
 }
 
 export function BotonPrimario({
@@ -28,55 +34,59 @@ export function BotonPrimario({
   onPress,
   deshabilitado = false,
   cargando = false,
-  tipo = 'primario',
-  tamano = 'mediano',
-  ancho = 'completo',
+  tipo = "primario",
+  tamano = "mediano",
+  ancho = "completo",
   estiloPersonalizado,
   estiloTextoPersonalizado,
   icono,
-  posicionIcono = 'izquierda',
+  posicionIcono = "izquierda",
 }: PropsBotonPrimario) {
-  
   const obtenerEstiloBoton = (): ViewStyle => {
-    let estiloBase = EstilosBase.botonPrimario;
-    
+    let estiloBase: ViewStyle;
+
     switch (tipo) {
-      case 'secundario':
-        estiloBase = EstilosBase.botonSecundario;
+      case "secundario":
+        estiloBase = { ...EstilosBase.botonSecundario };
         break;
-      case 'peligro':
-        estiloBase = EstilosBase.botonPeligro;
+      case "peligro":
+        estiloBase = { ...EstilosBase.botonPeligro };
         break;
-      case 'exito':
-        estiloBase = EstilosBase.botonExito;
+      case "exito":
+        estiloBase = { ...EstilosBase.botonExito };
         break;
       default:
-        estiloBase = EstilosBase.botonPrimario;
+        estiloBase = { ...EstilosBase.botonPrimario };
     }
 
     // Ajustar tamaño
     let paddingVertical = 14;
     let paddingHorizontal = 24;
-    
+
     switch (tamano) {
-      case 'pequeno':
+      case "pequeno":
         paddingVertical = 8;
         paddingHorizontal = 16;
         break;
-      case 'grande':
+      case "grande":
         paddingVertical = 18;
         paddingHorizontal = 32;
         break;
     }
 
     // Ajustar ancho
-    const anchoCompleto = ancho === 'completo' ? { width: '100%' } : {};
+    const anchoCompleto =
+      ancho === "completo" ? { width: "100%" as const } : {};
 
     // Estado deshabilitado
-    const estiloDeshabilitado = (deshabilitado || cargando) ? {
-      opacity: 0.5,
-      backgroundColor: tipo === 'secundario' ? 'transparent' : Colores.grisMedio,
-    } : {};
+    const estiloDeshabilitado =
+      deshabilitado || cargando
+        ? {
+            opacity: 0.5,
+            backgroundColor:
+              tipo === "secundario" ? "transparent" : Colores.grisMedio,
+          }
+        : {};
 
     return {
       ...estiloBase,
@@ -90,24 +100,24 @@ export function BotonPrimario({
 
   const obtenerEstiloTexto = (): TextStyle => {
     let colorTexto = Colores.textoBlanco;
-    
+
     switch (tipo) {
-      case 'secundario':
+      case "secundario":
         colorTexto = Colores.naranja;
         break;
-      case 'primario':
-      case 'peligro':
-      case 'exito':
+      case "primario":
+      case "peligro":
+      case "exito":
       default:
         colorTexto = Colores.textoBlanco;
     }
 
     let fontSize = 16;
     switch (tamano) {
-      case 'pequeno':
+      case "pequeno":
         fontSize = 14;
         break;
-      case 'grande':
+      case "grande":
         fontSize = 18;
         break;
     }
@@ -123,26 +133,30 @@ export function BotonPrimario({
   const renderContenido = () => {
     if (cargando) {
       return (
-        <ActivityIndicator 
-          size="small" 
-          color={tipo === 'secundario' ? Colores.naranja : Colores.textoBlanco} 
+        <ActivityIndicator
+          size="small"
+          color={tipo === "secundario" ? Colores.naranja : Colores.textoBlanco}
         />
       );
     }
 
-    if (icono && posicionIcono === 'izquierda') {
+    if (icono && posicionIcono === "izquierda") {
       return (
         <>
           {icono}
-          <Text style={[obtenerEstiloTexto(), { marginLeft: 8 }]}>{titulo}</Text>
+          <Text style={[obtenerEstiloTexto(), { marginLeft: 8 }]}>
+            {titulo}
+          </Text>
         </>
       );
     }
 
-    if (icono && posicionIcono === 'derecha') {
+    if (icono && posicionIcono === "derecha") {
       return (
         <>
-          <Text style={[obtenerEstiloTexto(), { marginRight: 8 }]}>{titulo}</Text>
+          <Text style={[obtenerEstiloTexto(), { marginRight: 8 }]}>
+            {titulo}
+          </Text>
           {icono}
         </>
       );
