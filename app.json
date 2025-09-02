@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "boletaia",
-    "slug": "boletaia",
+    "slug": "boletaia-v2",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/Icon.png",
@@ -17,7 +17,15 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.pipealzamora.boletaia"
+      "package": "com.pipealzamora.boletaia",
+      "versionCode": 1,
+      "permissions": [
+        "INTERNET",
+        "ACCESS_NETWORK_STATE",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_EXTERNAL_STORAGE"
+      ],
+      "allowBackup": false
     },
     "web": {
       "bundler": "metro",
@@ -43,10 +51,7 @@
       "typedRoutes": true
     },
     "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "a35dd1bc-7064-410d-a3df-33b44e27cbbc"
-      }
+      "router": {}
     },
     "owner": "pipealzamora"
   }
