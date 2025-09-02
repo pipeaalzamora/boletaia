@@ -4,9 +4,15 @@
  * Integrado con sistema de autenticación
  */
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { createContext, ReactNode, useContext, useEffect, useReducer } from 'react';
-import { ServicioNotificaciones } from '../services/NotificacionesService';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useReducer,
+} from "react";
+import { ServicioNotificaciones } from "../services/NotificacionesService";
 import {
   AccionesBoletasContexto,
   ActualizacionBoleta,
@@ -15,20 +21,29 @@ import {
   EstadoBoletasContexto,
   NuevaBoleta,
   UsuarioInterface,
-} from '../types';
-import { useAuth } from './AuthContext';
+} from "../types";
 
 // Tipos para el reducer
 type AccionBoletas =
-  | { type: 'SET_CARGANDO'; payload: boolean }
-  | { type: 'SET_BOLETAS'; payload: BoletaInterface[] }
-  | { type: 'AGREGAR_BOLETA'; payload: BoletaInterface }
-  | { type: 'ACTUALIZAR_BOLETA'; payload: BoletaInterface }
-  | { type: 'ELIMINAR_BOLETA'; payload: string }
-  | { type: 'SET_USUARIO'; payload: UsuarioInterface | null }
-  | { type: 'SET_CONFIGURACION_NOTIFICACIONES'; payload: ConfiguracionNotificaciones | null }
-  | { type: 'SET_ERROR'; payload: string | null }
-  | { type: 'CARGAR_DATOS_LOCALES'; payload: { boletas: BoletaInterface[]; usuario: UsuarioInterface | null; configuracion: ConfiguracionNotificaciones | null } };
+  | { type: "SET_CARGANDO"; payload: boolean }
+  | { type: "SET_BOLETAS"; payload: BoletaInterface[] }
+  | { type: "AGREGAR_BOLETA"; payload: BoletaInterface }
+  | { type: "ACTUALIZAR_BOLETA"; payload: BoletaInterface }
+  | { type: "ELIMINAR_BOLETA"; payload: string }
+  | { type: "SET_USUARIO"; payload: UsuarioInterface | null }
+  | {
+      type: "SET_CONFIGURACION_NOTIFICACIONES";
+      payload: ConfiguracionNotificaciones | null;
+    }
+  | { type: "SET_ERROR"; payload: string | null }
+  | {
+      type: "CARGAR_DATOS_LOCALES";
+      payload: {
+        boletas: BoletaInterface[];
+        usuario: UsuarioInterface | null;
+        configuracion: ConfiguracionNotificaciones | null;
+      };
+    };
 
 // Estado inicial
 const estadoInicial: EstadoBoletasContexto = {
@@ -40,47 +55,52 @@ const estadoInicial: EstadoBoletasContexto = {
 };
 
 // Reducer
-function boletasReducer(estado: EstadoBoletasContexto, accion: AccionBoletas): EstadoBoletasContexto {
+function boletasReducer(
+  estado: EstadoBoletasContexto,
+  accion: AccionBoletas
+): EstadoBoletasContexto {
   switch (accion.type) {
-    case 'SET_CARGANDO':
+    case "SET_CARGANDO":
       return { ...estado, boletasCargando: accion.payload };
-    
-    case 'SET_BOLETAS':
+
+    case "SET_BOLETAS":
       return { ...estado, boletas: accion.payload, boletasCargando: false };
-    
-    case 'AGREGAR_BOLETA':
-      return { 
-        ...estado, 
+
+    case "AGREGAR_BOLETA":
+      return {
+        ...estado,
         boletas: [...estado.boletas, accion.payload],
         boletasCargando: false,
       };
-    
-    case 'ACTUALIZAR_BOLETA':
+
+    case "ACTUALIZAR_BOLETA":
       return {
         ...estado,
-        boletas: estado.boletas.map(boleta =>
+        boletas: estado.boletas.map((boleta) =>
           boleta.id === accion.payload.id ? accion.payload : boleta
         ),
         boletasCargando: false,
       };
-    
-    case 'ELIMINAR_BOLETA':
+
+    case "ELIMINAR_BOLETA":
       return {
         ...estado,
-        boletas: estado.boletas.filter(boleta => boleta.id !== accion.payload),
+        boletas: estado.boletas.filter(
+          (boleta) => boleta.id !== accion.payload
+        ),
         boletasCargando: false,
       };
-    
-    case 'SET_USUARIO':
+
+    case "SET_USUARIO":
       return { ...estado, usuario: accion.payload };
-    
-    case 'SET_CONFIGURACION_NOTIFICACIONES':
+
+    case "SET_CONFIGURACION_NOTIFICACIONES":
       return { ...estado, configuracionNotificaciones: accion.payload };
-    
-    case 'SET_ERROR':
+
+    case "SET_ERROR":
       return { ...estado, error: accion.payload, boletasCargando: false };
-    
-    case 'CARGAR_DATOS_LOCALES':
+
+    case "CARGAR_DATOS_LOCALES":
       return {
         ...estado,
         boletas: accion.payload.boletas,
@@ -88,20 +108,22 @@ function boletasReducer(estado: EstadoBoletasContexto, accion: AccionBoletas): E
         configuracionNotificaciones: accion.payload.configuracion,
         boletasCargando: false,
       };
-    
+
     default:
       return estado;
   }
 }
 
 // Context
-const BoletasContext = createContext<(EstadoBoletasContexto & AccionesBoletasContexto) | undefined>(undefined);
+const BoletasContext = createContext<
+  (EstadoBoletasContexto & AccionesBoletasContexto) | undefined
+>(undefined);
 
 // Keys para AsyncStorage
 const STORAGE_KEYS = {
-  BOLETAS: '@boletaia_boletas',
-  USUARIO: '@boletaia_usuario',
-  CONFIGURACION: '@boletaia_configuracion',
+  BOLETAS: "@boletaia_boletas",
+  USUARIO: "@boletaia_usuario",
+  CONFIGURACION: "@boletaia_configuracion",
 };
 
 // Utilidades de almacenamiento
@@ -110,7 +132,7 @@ const StorageUtils = {
     try {
       await AsyncStorage.setItem(STORAGE_KEYS.BOLETAS, JSON.stringify(boletas));
     } catch (error) {
-      console.error('Error al guardar boletas:', error);
+      console.error("Error al guardar boletas:", error);
     }
   },
 
@@ -124,24 +146,30 @@ const StorageUtils = {
           const convertirFechaSafe = (fecha: any): Date => {
             if (!fecha) return new Date();
             const fechaConvertida = new Date(fecha);
-            return isNaN(fechaConvertida.getTime()) ? new Date() : fechaConvertida;
+            return isNaN(fechaConvertida.getTime())
+              ? new Date()
+              : fechaConvertida;
           };
-          
+
           return {
             ...boleta,
             fechaEmision: convertirFechaSafe(boleta.fechaEmision),
             fechaVencimiento: convertirFechaSafe(boleta.fechaVencimiento),
-            fechaCorte: boleta.fechaCorte ? convertirFechaSafe(boleta.fechaCorte) : undefined,
+            fechaCorte: boleta.fechaCorte
+              ? convertirFechaSafe(boleta.fechaCorte)
+              : undefined,
             fechaProximaLectura: convertirFechaSafe(boleta.fechaProximaLectura),
             fechaCreacion: convertirFechaSafe(boleta.fechaCreacion),
             fechaActualizacion: convertirFechaSafe(boleta.fechaActualizacion),
-            fechaPago: boleta.fechaPago ? convertirFechaSafe(boleta.fechaPago) : undefined,
+            fechaPago: boleta.fechaPago
+              ? convertirFechaSafe(boleta.fechaPago)
+              : undefined,
           };
         });
       }
       return [];
     } catch (error) {
-      console.error('Error al cargar boletas:', error);
+      console.error("Error al cargar boletas:", error);
       return [];
     }
   },
@@ -150,7 +178,7 @@ const StorageUtils = {
     try {
       await AsyncStorage.setItem(STORAGE_KEYS.USUARIO, JSON.stringify(usuario));
     } catch (error) {
-      console.error('Error al guardar usuario:', error);
+      console.error("Error al guardar usuario:", error);
     }
   },
 
@@ -166,17 +194,24 @@ const StorageUtils = {
       }
       return null;
     } catch (error) {
-      console.error('Error al cargar usuario:', error);
+      console.error("Error al cargar usuario:", error);
       return null;
     }
   },
 
-  async guardarConfiguracion(configuracion: ConfiguracionNotificaciones): Promise<void> {
+  async guardarConfiguracion(
+    configuracion: ConfiguracionNotificaciones
+  ): Promise<void> {
     try {
-      await AsyncStorage.setItem(STORAGE_KEYS.CONFIGURACION, JSON.stringify(configuracion));
-      console.log('Configuración guardada en storage:', { habilitadas: configuracion.habilitadas });
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.CONFIGURACION,
+        JSON.stringify(configuracion)
+      );
+      console.log("Configuración guardada en storage:", {
+        habilitadas: configuracion.habilitadas,
+      });
     } catch (error) {
-      console.error('Error al guardar configuración en AsyncStorage:', error);
+      console.error("Error al guardar configuración en AsyncStorage:", error);
       throw error;
     }
   },
@@ -186,11 +221,13 @@ const StorageUtils = {
       const configJson = await AsyncStorage.getItem(STORAGE_KEYS.CONFIGURACION);
       const resultado = configJson ? JSON.parse(configJson) : null;
       if (resultado) {
-        console.log('Configuración cargada:', { habilitadas: resultado.habilitadas });
+        console.log("Configuración cargada:", {
+          habilitadas: resultado.habilitadas,
+        });
       }
       return resultado;
     } catch (error) {
-      console.error('Error al cargar configuración:', error);
+      console.error("Error al cargar configuración:", error);
       return null;
     }
   },
@@ -203,7 +240,6 @@ interface BoletasProviderProps {
 
 export function BoletasProvider({ children }: BoletasProviderProps) {
   const [estado, dispatch] = useReducer(boletasReducer, estadoInicial);
-  const { usuario: usuarioAuth, estaAutenticado } = useAuth();
 
   // Cargar datos al inicializar
   useEffect(() => {
@@ -229,11 +265,11 @@ export function BoletasProvider({ children }: BoletasProviderProps) {
 
   const cargarDatosIniciales = async () => {
     try {
-      dispatch({ type: 'SET_CARGANDO', payload: true });
-      
+      dispatch({ type: "SET_CARGANDO", payload: true });
+
       // Solicitar permisos de notificaciones
       await ServicioNotificaciones.solicitarPermisos();
-      
+
       const [boletas, usuario, configuracion] = await Promise.all([
         StorageUtils.cargarBoletas(),
         StorageUtils.cargarUsuario(),
@@ -241,38 +277,46 @@ export function BoletasProvider({ children }: BoletasProviderProps) {
       ]);
 
       dispatch({
-        type: 'CARGAR_DATOS_LOCALES',
+        type: "CARGAR_DATOS_LOCALES",
         payload: { boletas, usuario, configuracion },
       });
-      
+
       // Reprogramar notificaciones si hay configuración
       if (configuracion && configuracion.habilitadas) {
-        await ServicioNotificaciones.reprogramarTodasLasNotificaciones(boletas, configuracion);
+        await ServicioNotificaciones.reprogramarTodasLasNotificaciones(
+          boletas,
+          configuracion
+        );
       }
     } catch (error) {
-      console.error('Error al cargar datos iniciales:', error);
-      dispatch({ type: 'SET_ERROR', payload: 'Error al cargar datos de la aplicación' });
+      console.error("Error al cargar datos iniciales:", error);
+      dispatch({
+        type: "SET_ERROR",
+        payload: "Error al cargar datos de la aplicación",
+      });
     }
   };
 
   const cargarBoletas = async (): Promise<void> => {
     try {
-      dispatch({ type: 'SET_CARGANDO', payload: true });
+      dispatch({ type: "SET_CARGANDO", payload: true });
       const boletas = await StorageUtils.cargarBoletas();
-      dispatch({ type: 'SET_BOLETAS', payload: boletas });
+      dispatch({ type: "SET_BOLETAS", payload: boletas });
     } catch (error) {
-      console.error('Error al cargar boletas:', error);
-      dispatch({ type: 'SET_ERROR', payload: 'Error al cargar las boletas' });
+      console.error("Error al cargar boletas:", error);
+      dispatch({ type: "SET_ERROR", payload: "Error al cargar las boletas" });
     }
   };
 
-  const agregarBoleta = async (nuevaBoleta: NuevaBoleta): Promise<BoletaInterface> => {
+  const agregarBoleta = async (
+    nuevaBoleta: NuevaBoleta
+  ): Promise<BoletaInterface> => {
     try {
-      dispatch({ type: 'SET_CARGANDO', payload: true });
-      
-      // Usar usuario autenticado si está disponible, sino usar el usuario del estado local
-      const usuarioId = usuarioAuth?.id || estado.usuario?.id || 'usuario_temporal';
-      
+      dispatch({ type: "SET_CARGANDO", payload: true });
+
+      // Usar el usuario del estado local
+      const usuarioId = estado.usuario?.id || "usuario_temporal";
+
       // Crear la boleta con datos completos
       const boleta: BoletaInterface = {
         id: `boleta_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -283,31 +327,34 @@ export function BoletasProvider({ children }: BoletasProviderProps) {
         fechaActualizacion: new Date(),
       };
 
-      dispatch({ type: 'AGREGAR_BOLETA', payload: boleta });
-      
+      dispatch({ type: "AGREGAR_BOLETA", payload: boleta });
+
       // Programar notificaciones si están habilitadas
       if (estado.configuracionNotificaciones?.habilitadas) {
         await ServicioNotificaciones.programarNotificacionesBoleta(
-          boleta, 
+          boleta,
           estado.configuracionNotificaciones
         );
       }
-      
+
       return boleta;
     } catch (error) {
-      console.error('Error al agregar boleta:', error);
-      dispatch({ type: 'SET_ERROR', payload: 'Error al agregar la boleta' });
+      console.error("Error al agregar boleta:", error);
+      dispatch({ type: "SET_ERROR", payload: "Error al agregar la boleta" });
       throw error;
     }
   };
 
-  const actualizarBoleta = async (id: string, datos: ActualizacionBoleta): Promise<BoletaInterface> => {
+  const actualizarBoleta = async (
+    id: string,
+    datos: ActualizacionBoleta
+  ): Promise<BoletaInterface> => {
     try {
-      dispatch({ type: 'SET_CARGANDO', payload: true });
-      
-      const boletaActual = estado.boletas.find(b => b.id === id);
+      dispatch({ type: "SET_CARGANDO", payload: true });
+
+      const boletaActual = estado.boletas.find((b) => b.id === id);
       if (!boletaActual) {
-        throw new Error('Boleta no encontrada');
+        throw new Error("Boleta no encontrada");
       }
 
       const boletaActualizada: BoletaInterface = {
@@ -316,11 +363,11 @@ export function BoletasProvider({ children }: BoletasProviderProps) {
         fechaActualizacion: new Date(),
       };
 
-      dispatch({ type: 'ACTUALIZAR_BOLETA', payload: boletaActualizada });
+      dispatch({ type: "ACTUALIZAR_BOLETA", payload: boletaActualizada });
       return boletaActualizada;
     } catch (error) {
-      console.error('Error al actualizar boleta:', error);
-      dispatch({ type: 'SET_ERROR', payload: 'Error al actualizar la boleta' });
+      console.error("Error al actualizar boleta:", error);
+      dispatch({ type: "SET_ERROR", payload: "Error al actualizar la boleta" });
       throw error;
     }
   };
@@ -331,62 +378,71 @@ export function BoletasProvider({ children }: BoletasProviderProps) {
         estaPagada: true,
         fechaPago: new Date(),
       };
-      
+
       const boletaActualizada = await actualizarBoleta(id, actualizacion);
-      
+
       // Cancelar notificaciones de la boleta pagada
       await ServicioNotificaciones.cancelarNotificacionesBoleta(id);
-      
+
       return boletaActualizada;
     } catch (error) {
-      console.error('Error al marcar como pagada:', error);
+      console.error("Error al marcar como pagada:", error);
       throw error;
     }
   };
 
   const eliminarBoleta = async (id: string): Promise<void> => {
     try {
-      dispatch({ type: 'SET_CARGANDO', payload: true });
-      
+      dispatch({ type: "SET_CARGANDO", payload: true });
+
       // Cancelar notificaciones de la boleta
       await ServicioNotificaciones.cancelarNotificacionesBoleta(id);
-      
-      dispatch({ type: 'ELIMINAR_BOLETA', payload: id });
+
+      dispatch({ type: "ELIMINAR_BOLETA", payload: id });
     } catch (error) {
-      console.error('Error al eliminar boleta:', error);
-      dispatch({ type: 'SET_ERROR', payload: 'Error al eliminar la boleta' });
+      console.error("Error al eliminar boleta:", error);
+      dispatch({ type: "SET_ERROR", payload: "Error al eliminar la boleta" });
       throw error;
     }
   };
 
-  const configurarNotificaciones = async (config: ConfiguracionNotificaciones): Promise<void> => {
+  const configurarNotificaciones = async (
+    config: ConfiguracionNotificaciones
+  ): Promise<void> => {
     try {
-      console.log('Configurando notificaciones:', { habilitadas: config.habilitadas });
-      
+      console.log("Configurando notificaciones:", {
+        habilitadas: config.habilitadas,
+      });
+
       // Primero guardar la configuración en AsyncStorage
       await StorageUtils.guardarConfiguracion(config);
-      
+
       // Luego actualizar el estado del contexto
-      dispatch({ type: 'SET_CONFIGURACION_NOTIFICACIONES', payload: config });
-      
+      dispatch({ type: "SET_CONFIGURACION_NOTIFICACIONES", payload: config });
+
       // Finalmente reprogramar o cancelar notificaciones
       if (config.habilitadas) {
-        await ServicioNotificaciones.reprogramarTodasLasNotificaciones(estado.boletas, config);
+        await ServicioNotificaciones.reprogramarTodasLasNotificaciones(
+          estado.boletas,
+          config
+        );
       } else {
         await ServicioNotificaciones.cancelarTodasLasNotificaciones();
       }
-      
-      console.log('Configuración aplicada exitosamente');
-      
+
+      console.log("Configuración aplicada exitosamente");
     } catch (error) {
-      console.error('Error al configurar notificaciones:', error);
-      dispatch({ type: 'SET_ERROR', payload: 'Error al configurar las notificaciones' });
+      console.error("Error al configurar notificaciones:", error);
+      dispatch({
+        type: "SET_ERROR",
+        payload: "Error al configurar las notificaciones",
+      });
       throw error;
     }
   };
 
   const setError = (error: string | null) => {
-    dispatch({ type: 'SET_ERROR', payload: error });
+    dispatch({ type: "SET_ERROR", payload: error });
   };
 
   // Crear usuario temporal si no existe
@@ -394,21 +450,24 @@ export function BoletasProvider({ children }: BoletasProviderProps) {
     if (!estado.usuario && !estado.boletasCargando) {
       const usuarioTemporal: UsuarioInterface = {
         id: `usuario_${Date.now()}`,
-        nombre: 'Usuario',
-        email: 'usuario@boletaia.app',
+        nombre: "Usuario",
+        email: "usuario@boletaia.app",
         fechaRegistro: new Date(),
         configuracionNotificaciones: {
           usuarioId: `usuario_${Date.now()}`,
           tresDiasAntes: true,
           unaSemanaAntes: true,
           elMismoDia: true,
-          horaNotificacion: '09:00',
+          horaNotificacion: "09:00",
           habilitadas: true,
         },
       };
-      
-      dispatch({ type: 'SET_USUARIO', payload: usuarioTemporal });
-      dispatch({ type: 'SET_CONFIGURACION_NOTIFICACIONES', payload: usuarioTemporal.configuracionNotificaciones });
+
+      dispatch({ type: "SET_USUARIO", payload: usuarioTemporal });
+      dispatch({
+        type: "SET_CONFIGURACION_NOTIFICACIONES",
+        payload: usuarioTemporal.configuracionNotificaciones,
+      });
     }
   }, [estado.usuario, estado.boletasCargando]);
 
@@ -424,9 +483,7 @@ export function BoletasProvider({ children }: BoletasProviderProps) {
   };
 
   return (
-    <BoletasContext.Provider value={valor}>
-      {children}
-    </BoletasContext.Provider>
+    <BoletasContext.Provider value={valor}>{children}</BoletasContext.Provider>
   );
 }
 
@@ -434,7 +491,9 @@ export function BoletasProvider({ children }: BoletasProviderProps) {
 export function useBoletasContext() {
   const contexto = useContext(BoletasContext);
   if (contexto === undefined) {
-    throw new Error('useBoletasContext debe ser usado dentro de un BoletasProvider');
+    throw new Error(
+      "useBoletasContext debe ser usado dentro de un BoletasProvider"
+    );
   }
   return contexto;
 }
